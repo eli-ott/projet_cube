@@ -6,7 +6,7 @@ namespace Cube {
         public static void Main(string[] args) {
 
             var SpecialOrigin = "special_origin";
-            var builder = WebApplication.CreateBuilder(args);
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddCors(option => {
                 option.AddPolicy(name: SpecialOrigin, policy => {
@@ -17,8 +17,6 @@ namespace Cube {
             builder.Services.AddControllers();
           
             WebApplication app = builder.Build();
-
-
 
             DBConnection connection = DBConnection.Instance();
             connection.Server       = "localhost";
