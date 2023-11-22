@@ -4,20 +4,9 @@ using MySql.Data.MySqlClient;
 namespace Cube {
     public class Program {
         public static void Main(string[] args) {
-
-            var SpecialOrigin = "special_origin";
-            var builder = WebApplication.CreateBuilder(args);
-
-            builder.Services.AddCors(option => {
-                option.AddPolicy(name: SpecialOrigin, policy => {
-                    policy.WithOrigins("http://127.0.0.1:5500", "http://127.0.0.1:5023");
-                });
-            });
-
-            builder.Services.AddControllers();
-          
-            WebApplication app = builder.Build();
-
+            
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+            WebApplication app            = builder.Build();
 
 
             DBConnection connection = DBConnection.Instance();
@@ -46,8 +35,6 @@ namespace Cube {
                 connection.Close();
 
             } // if ..
-
-            app.UseCors(SpecialOrigin);
 
             app.Run();
 
