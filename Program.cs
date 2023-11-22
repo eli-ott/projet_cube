@@ -1,7 +1,6 @@
-﻿namespace Cube {
-    class Program {
-        static void Main(string[] args) {
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
 
-        } // void ..
-    } // class ..
-} // namepsace ..
+app.MapGet("/", () => "Hello World!");
+
+app.Run();
