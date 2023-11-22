@@ -1,0 +1,63 @@
+html,
+body {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
+    height: 100%;
+    width: 100%;
+
+    background: no-repeat center / cover url(../assets/background.svg);
+}
+
+body {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+form {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+}
+
+input {
+    outline: none;
+    padding: 10px;
+    font-size: 19px;
+    transition: 0.15s;
+
+    background: none;
+    color: black;
+    border: solid 2px black;
+}
+
+input:focus,
+input:focus-within,
+input:focus-visible {
+    border-color: white;
+}
+
+button {
+    cursor: pointer;
+
+    padding: 10px;
+    min-width: 200px;
+    font-size: 19px;
+    transition: 0.15s;
+
+    background: white;
+    color: black;
+    border: solid 1px black;
+}
+
+button:hover {
+    background: none;
+    color: white;
+    border-color: white;
+    background: black;
+}
