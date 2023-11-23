@@ -12,9 +12,14 @@ formulaire.addEventListener('submit', async (event) => {
     //récupération du code postal
     let codePostal = document.getElementById('code-postal').value;
 
-    //fetch l'api en fonction du code postal
-    const res = await fetch(`http://localhost:5023/${codePostal}`);
-    const ret = await res.json();
+    let res, ret;
+    //vérifie si l'input est un code postal ou un nom de ville
+    if(parseInt(codePostal) > 1) {
+        res = await fetch(`http://localhost:5023/zipcode${codePostal}`);
+        ret = await res.json();
+    } else {
+        //fetch city name ?
+    }
 
     //la réponse de l'api
     console.log(ret);
