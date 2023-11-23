@@ -16,3 +16,7 @@
   ```json
   "/citiesinradius-59000lille-4" : ["59320emmerin", "59155faches_thumesnil", "59000lille", "59777lille", "59800lille", "59120loos", "59790ronchin", "59139wattignies"]
   ```
+  `/cityname-{SLUG}` → renvois le(s) code(s) postal / postaux de la ville recherchée 
+  ```json
+  "/cityname-lille" : ["59160","59260","59000","59777","59800"]
+  ```

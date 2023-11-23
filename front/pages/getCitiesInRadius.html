@@ -8,25 +8,18 @@
   </head>
   <body>
     <form id="formulaire">
-      <h1>Entrez le code postal et le nom de deux villes</h1>
-      <h2>Ville 1</h2>
+      <h1>Entrez le code postal et le nom d'une ville</h1>
       <input
         type="number"
+        id="code-postal"
         required
         minlength="5"
-        id="code-postal1"
         placeholder="Code postal"
       />
-      <input type="text" id="slug1" required placeholder="Nom de la ville" />
-      <h2>Ville 2</h2>
-      <input
-        type="number"
-        required
-        minlength="5"
-        id="code-postal2"
-        placeholder="Code postal"
-      />
-      <input type="text" id="slug2" required placeholder="Nom de la ville" />
+      <input type="text" id="slug" required placeholder="Nom de la ville" />
+      <h1>Entrez le rayon de recherche</h1>
+      <input type="number" id="radius" required placeholder="Rayon" />
+
       <button type="submit">Envoyer</button>
     </form>
     <div id="infos-container">

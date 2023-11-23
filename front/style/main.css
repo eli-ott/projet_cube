@@ -28,14 +28,16 @@ form {
 
 #infos-container {
     display: flex;
-    flex-flow: column nowrap;
+    flex-flow: column wrap;
     justify-content: center;
     align-items: center;
 
     display: none;
+    width: 100%;
 }
 
 #infos-container p {
+    text-wrap: wrap;
     font-size: 21px;
 }
 
