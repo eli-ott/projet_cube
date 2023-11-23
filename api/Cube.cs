@@ -85,6 +85,7 @@ namespace Cube {
             }); // ..
 
             GetCityPosition(app, positions);
+            GetCityDistance(app, positions);
 
             app.UseCors(SpecialOrigin);
             app.Run();
@@ -94,7 +95,7 @@ namespace Cube {
 
         /// <summary>
         /// Retourne la position GPS d'une ville donnée
-        /// <para> Exemple: 59000 Lille -> `/citypos59000lille` </para>
+        /// <para> Exemple: 59000 Lille -> `/citypos59000lille`</para>
         /// </summary>
         /// <param name="app"></param>
         /// <param name="positions"></param>
@@ -113,5 +114,81 @@ namespace Cube {
                 
             }); // ..
         } // void ..
+
+
+        /// <summary>
+        /// Retourne la distance en KM entre deux villes données
+        /// <para> Exemple: 59000 Lille à 75001 Paris -> `/citydist59000lille-75001paris`</para>
+        /// <para> En cas d'erreur, la valeur sera de -1.KM </para>
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="positions"></param>
+        private static void GetCityDistance(
+            WebApplication app,
+            Dictionary<string, Vector2> positions
+        ) {
+
+            app.MapGet("/citydist{citykeys}", (string citykeys) => {
+
+                String[] cityKeysParsed = citykeys.Split('-', 2);
+
+                // On vérifie s'il y a bien deux clés puis si les deux clé de ville sont enregistrées
+                return new Dictionary<string, float?>() {{
+                    "dist", (cityKeysParsed.Length == 2
+                        && positions.TryGetValue(cityKeysParsed[0], out Vector2 positionA)
+                        && positions.TryGetValue(cityKeysParsed[1], out Vector2 positionB))
+                    ? GetGPSDistance(positionA, positionB)
+                    : null
+                }}; // ..
+            }); // ..
+        } // void ..
+
+
+
+        /// <summary> Diamètre de la Terre en kilomètres </summary>
+        const float EARTH_RADIUS_KM = 6367.445f;
+
+        /// <summary> Circonférence de la Terre en kilomètres </summary>
+        const float EARTH_CIRCUMFERENCE_KM = 40075f;
+        
+        /// <summary> Nombre de kilomètre entre un degré de latitude </summary>
+        const float KM_PER_DEGREE_LAT = EARTH_CIRCUMFERENCE_KM / 360f;
+
+        /// <summary> Permets de convertir des degrés en radians </summary>
+        const float DEGREE_TO_RADIAN = MathF.PI / 180;
+
+        /// <summary>
+        /// Permet de calculer la distance entre deux coordonnées gps sur Terre
+        /// </summary>
+        /// <param name="gpsLocationA"></param>
+        /// <param name="gpsLocationB"></param>
+        /// <returns></returns>
+        private static float GetGPSDistance(
+            Vector2 gpsLocationA,
+            Vector2 gpsLocationB
+        ) {
+
+            // Conversion en radians
+            float lat1Rad = gpsLocationA.X * DEGREE_TO_RADIAN;
+            float lat2Rad = gpsLocationA.X * DEGREE_TO_RADIAN;
+            float deltaLatRad = (gpsLocationB.X - gpsLocationA.X) * DEGREE_TO_RADIAN;
+            float deltaLngRad = (gpsLocationB.Y - gpsLocationA.Y) * DEGREE_TO_RADIAN;
+
+            float halfDeltaLatRad = deltaLatRad * 0.5f;
+            float halfDeltaLngRad = deltaLngRad * 0.5f;
+
+            // Formule de Haversine
+            float a = MathF.Sin(halfDeltaLatRad) * MathF.Sin(halfDeltaLatRad)
+                + MathF.Cos(lat1Rad) * MathF.Cos(lat2Rad)
+                * MathF.Sin(halfDeltaLngRad) * MathF.Sin(halfDeltaLngRad);
+
+            float c = 2 * MathF.Atan2(MathF.Sqrt(a), MathF.Sqrt(1 - a));
+
+            // Calcul de la distance
+            float distance = EARTH_RADIUS_KM * c;
+
+            return distance;
+
+        } // float ..
     } // class ..
 } // namespace ..
