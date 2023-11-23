@@ -18,7 +18,7 @@ formulaire.addEventListener('submit', async (event) => {
         res = await fetch(`http://localhost:5023/citiesinzipcode-${code}`);
         ret = await res.json();
     } else {
-        res = await fetch(`http://localhost:5023/cityname-${code}`);
+        res = await fetch(`http://localhost:5023/zipcodesfromcity-${code}`);
         ret = await res.json();
     }
 

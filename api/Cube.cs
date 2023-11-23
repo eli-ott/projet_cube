@@ -97,8 +97,8 @@ namespace Cube {
             WebApplication app,
             Dictionary<string, List<string>> zipCodes
         ) {
-            app.MapGet("/cityname-{cityName}", (string cityName) => {
-                
+            app.MapGet("/zipcodesfromcity-{cityName}", (string cityName) => {
+
                 List<string> foundZipCodes = new ();   
 
                 foreach(KeyValuePair<string, List<string>> entry in zipCodes)

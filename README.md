@@ -2,7 +2,7 @@
 ## Requêtes
 - `/citiesinzipcode-{ZIP_CODE}` → renvois les villes ayant ce code postal 
   ```json
-  "/citiesinzipcode-59112" : [ "annoeullin","carnin"]
+  "/citiesinzipcode-59112" : ["annoeullin","carnin"]
   ```
 - `/citypos-{ZIP_CODE+SLUG}` → renvois la position GPS de la ville
   ```json
@@ -18,5 +18,5 @@
   ```
   `/cityname-{SLUG}` → renvois le(s) code(s) postal / postaux de la ville recherchée 
   ```json
-  "/citynamelille" : ["59160","59260","59000","59777","59800"]
+  "/zipcodesfromcity-lille" : ["59160","59260","59000","59777","59800"]
   ```
