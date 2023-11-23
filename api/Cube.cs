@@ -226,7 +226,7 @@ namespace Cube {
                     else Console.WriteLine("Le code de ville : " + argsSplit[0] + " n'est associé à aucune position GPS !");
                 else Console.WriteLine("Le nombre d'argument est incorrect (" + argsSplit.Length + "/2) !");
 
-                return null
+                return null;
             }); // ..
         } // void ..
 
