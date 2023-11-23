@@ -10,15 +10,16 @@ formulaire.addEventListener('submit', async (event) => {
     info.innerHTML = '';
 
     //récupération du code postal
-    let codePostal = document.getElementById('code-postal').value;
+    let code = document.getElementById('code-postal').value;
 
     let res, ret;
     //vérifie si l'input est un code postal ou un nom de ville
-    if(parseInt(codePostal) > 1) {
-        res = await fetch(`http://localhost:5023/citiesinzipcode-${codePostal}`);
+    if(parseInt(code) > 1) {
+        res = await fetch(`http://localhost:5023/citiesinzipcode-${code}`);
         ret = await res.json();
     } else {
-        //fetch city name ?
+        res = await fetch(`http://localhost:5023/cityname-${code}`);
+        ret = await res.json();
     }
 
     //la réponse de l'api
