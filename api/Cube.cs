@@ -100,7 +100,7 @@ namespace Cube {
 
                 // On vérifie s'il y a déjà un code postal enregistré
                 zipCodes.TryGetValue(zipCode, out List<string>? cityNamesOrNull);
-                return cityNamesOrNull;
+                return cityNamesOrNull?.Select(cityName => (zipCode + cityName).ParseCityKey() );
                 
             }); // ..
         } // void ..
@@ -175,7 +175,7 @@ namespace Cube {
                 return (argsSplit.Length == 2
                     && positions.TryGetValue(argsSplit[0], out Vector2 center)
                     && float.TryParse(argsSplit[1], CultureInfo.InvariantCulture.NumberFormat, out float radius))
-                ? ComputeCitiesInRadius(positions, center, radius)
+                ? ComputeCitiesInRadius(positions, center, radius).Select(cityKey => cityKey.ParseCityKey())
                 : null;
             }); // ..
         } // void ..
