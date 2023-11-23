@@ -106,7 +106,7 @@ namespace Cube {
                         foundZipCodes.Add(entry.Key);
 
                 if(foundZipCodes.Count == 0)
-                     Console.WriteLine(cityName + " n'est associé(e) à aucun code postal");
+                     Console.WriteLine(cityName + " n'est associé(e) à aucun code postal !");
                 else Console.WriteLine(cityName + " est associé au code postal : " + foundZipCodes.ToString());
                 return foundZipCodes;
 
@@ -128,6 +128,12 @@ namespace Cube {
 
                 // On vérifie s'il y a déjà un code postal enregistré
                 zipCodes.TryGetValue(zipCode, out List<string>? cityNamesOrNull);
+
+                if (cityNamesOrNull is List<string> cityNames)
+                     Console.WriteLine(cityNames.ToString() + " est / sont associé(es) au code postal : " + zipCode);
+
+                else Console.WriteLine(zipCode + " n'est associé à aucune ville !");
+
                 return cityNamesOrNull;
                 
             }); // ..
@@ -147,11 +153,17 @@ namespace Cube {
             app.MapGet("/citypos-{citykey}", (string citykey) => {
 
                 // On vérifie s'il y a déjà une clé de ville enregistrée
-                if (positions.TryGetValue(citykey, out Vector2 position))
+                if (positions.TryGetValue(citykey, out Vector2 position)) {
+
+                    Console.WriteLine("Le ville de code: " + citykey + " est située à la latitude : " + position.X + " et la longitude : " + position.Y);
                     return new Dictionary<string, float>() {{ "lat", position.X }, { "lng", position.Y }};
 
-                else return null;
-                
+                } else {
+
+                    Console.WriteLine("Le code de ville : " + citykey + " n'est associé à aucune position GPS !");
+                    return null;
+
+                } // if ..
             }); // ..
         } // void ..
 
@@ -171,15 +183,19 @@ namespace Cube {
 
                 string[] argsSplit = args.Split('-');
 
-                // On vérifie s'il y a bien deux clés puis si les deux clé de ville sont enregistrées
-                // Dans le cas contraire on renvois une valleur nulle
-                return new Dictionary<string, float?>() {{
-                    "dist", (argsSplit.Length == 2
-                        && positions.TryGetValue(argsSplit[0], out Vector2 positionA)
-                        && positions.TryGetValue(argsSplit[1], out Vector2 positionB))
-                    ? ComputeGPSDistance(positionA, positionB)
-                    : null
-                }}; // ..
+                // On vérifie s'il y a bien deux clés
+                if (argsSplit.Length == 2)
+                    // Puis si les deux clé de ville sont enregistrées
+                    // Dans le cas contraire on renvois une valleur nulle
+                    if (positions.TryGetValue(argsSplit[0], out Vector2 positionA))
+                        if (positions.TryGetValue(argsSplit[1], out Vector2 positionB))
+                            return new Dictionary<string, float>() {{ "dist", ComputeGPSDistance(positionA, positionB) }};
+
+                        else Console.WriteLine("Le code de ville : " + argsSplit[1] + " n'est associé à aucune position GPS !");
+                    else Console.WriteLine("Le code de ville : " + argsSplit[0] + " n'est associé à aucune position GPS !");
+                else Console.WriteLine("Le nombre d'argument est incorrect (" + argsSplit.Length + "/2) !");
+
+                return null;
             }); // ..
         } // void ..
 
@@ -198,13 +214,21 @@ namespace Cube {
 
                 string[] argsSplit = args.Split('-');
 
-                // On vérifie s'il y a bien deux clés puis si la clé de la ville centre est entregistrée et enfin on vérifie si le rayon est un nombre
-                // Dans le cas contraire on renvois une valleur nulle
-                return (argsSplit.Length == 2
-                    && positions.TryGetValue(argsSplit[0], out Vector2 center)
-                    && float.TryParse(argsSplit[1], CultureInfo.InvariantCulture.NumberFormat, out float radius))
-                ? ComputeCitiesInRadius(positions, center, radius)
-                : null;
+                // On vérifie s'il y a bien deux clés
+                if (argsSplit.Length == 2)
+                    // Puis si la clé de la ville centre est entregistrée
+                    // Dans le cas contraire on renvois une valleur nulle
+                    if (positions.TryGetValue(argsSplit[0], out Vector2 center))
+
+                        // Enfin on vérifie si le rayon est un nombre
+                        if (float.TryParse(argsSplit[1], CultureInfo.InvariantCulture.NumberFormat, out float radius))
+                            return ComputeCitiesInRadius(positions, center, radius);
+
+                        else Console.WriteLine(argsSplit[1] + " n'est pas un nombre valide !");
+                    else Console.WriteLine("Le code de ville : " + argsSplit[0] + " n'est associé à aucune position GPS !");
+                else Console.WriteLine("Le nombre d'argument est incorrect (" + argsSplit.Length + "/2) !");
+
+                return null;
             }); // ..
         } // void ..
 
