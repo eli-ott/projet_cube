@@ -220,7 +220,7 @@ namespace Cube {
 
                         // Enfin on vérifie si le rayon est un nombre
                         if (float.TryParse(argsSplit[1], CultureInfo.InvariantCulture.NumberFormat, out float radius))
-                            return ComputeCitiesInRadius(positions, center, radius);
+                            return ComputeCitiesInRadius(positions, center, radius).Select(cityKey => cityKey.ParseCityKey());
 
                         else Console.WriteLine(argsSplit[1] + " n'est pas un nombre valide !");
                     else Console.WriteLine("Le code de ville : " + argsSplit[0] + " n'est associé à aucune position GPS !");
