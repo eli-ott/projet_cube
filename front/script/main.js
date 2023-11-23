@@ -21,7 +21,9 @@ formulaire.addEventListener('submit', async (event) => {
 
             //affiche la réponse API
             ret.forEach((ville, i) => {
-                info.innerHTML += `${ville.toUpperCase()}`;
+                console.log(ville, ret);
+
+                info.innerHTML += `${ville.zipCode.toUpperCase()} ${ville.cityName.toUpperCase()}`;
 
                 if (ret.length > 1 && ret.length - 1 !== i) {
                     info.innerHTML += '&nbsp;&mdash;&nbsp;';
@@ -56,14 +58,15 @@ formulaire.addEventListener('submit', async (event) => {
             ret = await getCityInRadius();
 
             //affiche la réponse API
-            ret.forEach((code, i) => {
-                info.innerHTML += `${code}`;
+            ret.forEach((ville, i) => {
+                console.log(ville, ret);
+                info.innerHTML += `${ville.zipCode.toUpperCase()} ${ville.cityName.toUpperCase()}`;
 
                 if (ret.length > 1 && ret.length - 1 !== i) {
                     info.innerHTML += '&nbsp;&mdash;&nbsp;';
                 }
-                if(i % 5 === 0) {
-                    info.innerHTML += '<br/>';
+                if (i % 5 === 0) {
+                    info.innerHTML += '<br/><br/>';
                 }
             });
             break;
@@ -97,7 +100,7 @@ const getVille = async () => {
 const getCode = async () => {
     let name = document.getElementById('slug').value.toLowerCase().trim();
 
-    let res = await fetch(`${API_PATH}cityname-${slugify(name)}`);
+    let res = await fetch(`${API_PATH}zipcodesfromcity-${slugify(name)}`);
     return await res.json()
 }
 const getPos = async () => {
