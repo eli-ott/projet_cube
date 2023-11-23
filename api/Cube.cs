@@ -75,16 +75,7 @@ namespace Cube {
             } // if ..
 
 
-            app.MapGet("/zipcode{zipCode}", (string zipCode) => {
-
-                // On vérifie s'il y a déjà un code postal enregistré
-                zipCodes.TryGetValue(zipCode, out List<string>? cityNamesOrNull);
-
-                // S'il n'y a aucune ville liée, on sort une liste avec un message comme valeur
-                return cityNamesOrNull ?? new() { "Aucune ville" };
-                
-            }); // ..
-
+            GetCitiesInZipCode(app, zipCodes);
             GetCityPosition(app, positions);
             GetCityDistance(app, positions);
             GetCitiesInRadius(app, positions);
@@ -92,6 +83,26 @@ namespace Cube {
             app.UseCors(SpecialOrigin);
             app.Run();
 
+        } // void ..
+
+
+        /// <summary>
+        /// Retourne les villes possédant un même code postal
+        /// <para> Exemple: 59000 -> `/citiesinzipcode-59000` </para>
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="zipCodes"></param>
+        private static void GetCitiesInZipCode(
+            WebApplication app,
+            Dictionary<string, List<string>> zipCodes
+        ) {
+            app.MapGet("/citiesinzipcode-{zipCode}", (string zipCode) => {
+
+                // On vérifie s'il y a déjà un code postal enregistré
+                zipCodes.TryGetValue(zipCode, out List<string>? cityNamesOrNull);
+                return cityNamesOrNull;
+                
+            }); // ..
         } // void ..
 
 
