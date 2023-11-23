@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../style/main.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form id="formulaire">
+      <h1>Entrez le code postal et le nom de la ville</h1>
+      <input
+        type="number"
+        id="code-postal"
+        required
+        minlength="5"
+        placeholder="Code postal"
+      />
+      <input
+        type="text"
+        required
+        minlength="1"
+        id="slug"
+        placeholder="Nom de la ville"
+      />
+      <button type="submit">Envoyer</button>
+    </form>
+    <div id="infos-container">
+        <p id="infos"></p>
+        <button id="retour">Retour</button>
+    </div>
+    <br>
+    <a href="/">Retourner au menu</a>
+
+    <script lang="text/javascript" src="../script/main.js"></script>
+  </body>
+</html>
