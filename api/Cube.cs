@@ -94,6 +94,7 @@ namespace Cube {
 
         /// <summary>
         /// Retourne la position GPS d'une ville donnée
+        /// <para> Exemple: 59000 Lille -> `/citypos59000lille` </para>
         /// </summary>
         /// <param name="app"></param>
         /// <param name="positions"></param>
@@ -104,7 +105,7 @@ namespace Cube {
 
             app.MapGet("/citypos{citykey}", (string citykey) => {
 
-                // On vérifie s'il y a déjà un code postal enregistré
+                // On vérifie s'il y a déjà une clé de ville enregistrée
                 if (positions.TryGetValue(citykey, out Vector2 position))
                     return new Dictionary<string, float>() {{ "lat", position.X }, { "lng", position.Y }};
 
