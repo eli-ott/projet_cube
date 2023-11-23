@@ -25,6 +25,18 @@ form {
     gap: 25px;
 }
 
+#infos-container {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+
+    display: none;
+}
+#infos-container p {
+    font-size: 21px;
+}
+
 input {
     outline: none;
     padding: 10px;
