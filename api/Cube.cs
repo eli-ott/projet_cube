@@ -80,7 +80,7 @@ namespace Cube {
             GetZipCode(app, zipCodes);
             GetCityDistance(app, positions);
             GetCitiesInRadius(app, positions);
-
+            PostCity(app, zipCodes, positions);
 
             app.UseCors(SpecialOrigin);
             app.Run();
@@ -228,6 +228,49 @@ namespace Cube {
 
                 return null;
             }); // ..
+        } // void ..
+
+
+        /// <summary>
+        /// Ajoute une nouvelle ville
+        /// <para>
+        /// Exemple:
+        /// `
+        /// {
+        ///     "cityName": "New York"
+        ///     "zipCode":  "12345",
+        ///     "gpsLat":    40.7648,
+        ///     "gpsLng":   -73.9808,
+        /// }
+        /// `
+        /// </para>
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="zipCodes"></param>
+        private static void PostCity(
+            WebApplication app,
+            Dictionary<string, List<string>> zipCodes,
+            Dictionary<string, Vector2>      positions
+        ) {
+            app.MapPost("/newcity", (City newCity) => {
+
+                if (newCity.ZipCode is string zipCode)
+                    if (newCity.CityName is string cityName) {
+                        if (zipCodes.TryGetValue(zipCode, out List<string>? cityNamesOrNull)) {
+
+                            // Si la liste n'est pas initialisée, on en créé une
+                            if (cityNamesOrNull is List<string> cityNames) cityNames.Add(cityName);
+                            else zipCodes[zipCode] = new () { cityName };
+
+                        } else zipCodes.Add(zipCode, new () { cityName });
+
+                        if (newCity.GpsLat is float lat && newCity.GpsLng is float lng) {
+                            positions.TryAdd(zipCode + cityName, new Vector2(lat, lng));
+                            Console.WriteLine(lat);
+                        } // if ..
+                    } else Console.WriteLine("Il n'y a pas de nom de ville !");
+                else Console.WriteLine("Il n'y a pas de code postal !");
+            }) ; // ..
         } // void ..
 
 
