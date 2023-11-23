@@ -14,7 +14,7 @@ formulaire.addEventListener('submit', async (event) => {
 
     let res, ret;
     //vérifie si l'input est un code postal ou un nom de ville
-    res = await fetch(`http://localhost:5023/zipcode${codePostal}`);
+    res = await fetch(`http://localhost:5023/citiesinzipcode-${codePostal}`);
     ret = await res.json();
 
     //la réponse de l'api
