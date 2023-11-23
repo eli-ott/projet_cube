@@ -22,7 +22,7 @@ namespace Cube.Data {
         public bool IsConnect() {
             if (Connection == null) {
 
-                if (String.IsNullOrEmpty(DatabaseName))
+                if (string.IsNullOrEmpty(DatabaseName))
                     return false;
                 
                 Connection = new MySqlConnection(string.Format("Server={0}; database={1}; UID={2}; password={3}", Server, DatabaseName, UserName, Password));
