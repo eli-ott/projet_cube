@@ -70,6 +70,11 @@ formulaire.addEventListener('submit', async (event) => {
                 }
             });
             break;
+        case defaultPath + 'addCity.html':
+            ret = await addVille();
+
+            window.location.reload();
+            break;
     }
 
     //la réponse de l'api
@@ -126,4 +131,22 @@ const getCityInRadius = async () => {
 
     let res = await fetch(`${API_PATH}citiesinradius-${codePostal + slugify(slug)}-${radius}`)
     return await res.json();
+}
+const addVille = async () => {
+    let name = document.getElementById('nom').value;
+    let code = document.getElementById('code-postal').value;
+    let lat = document.getElementById('lat').value;
+    let lng = document.getElementById('lng').value;
+
+    const data = {
+        cityName: name | null,
+        zipCode: code | null,
+        gpsLat: lat | null,
+        gpsLng: lng | null
+    };
+
+    let res = await fetch(`${API_PATH}newcity`, {
+        method: 'POST'
+    });
+    console.log(res.text());
 }
