@@ -3,34 +3,73 @@ let infoContainer = document.getElementById('infos-container');
 let info = document.getElementById('infos');
 let retour = document.getElementById('retour');
 
+const API_PATH = "http://localhost:5023/";
+
 formulaire.addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    console.log(info);
     info.innerHTML = '';
 
-    //récupération du code postal
-    let code = document.getElementById('code-postal').value;
+    let ret;
 
-    let res, ret;
-    //vérifie si l'input est un code postal ou un nom de ville
-    if(parseInt(code) > 1) {
-        res = await fetch(`http://localhost:5023/citiesinzipcode-${code}`);
-        ret = await res.json();
-    } else {
-        res = await fetch(`http://localhost:5023/zipcodesfromcity-${code}`);
-        ret = await res.json();
+    let defaultPath = '/front/pages/'
+    let currentPath = window.location.pathname;
+
+    switch (currentPath) {
+        case defaultPath + 'getVille.html':
+            ret = await getVille();
+
+            //affiche la réponse API
+            ret.forEach((ville, i) => {
+                info.innerHTML += `${ville.toUpperCase()}`;
+
+                if (ret.length > 1 && ret.length - 1 !== i) {
+                    info.innerHTML += '&nbsp;&mdash;&nbsp;';
+                }
+            });
+            break;
+        case defaultPath + 'getCode.html':
+            ret = await getCode();
+            console.log(ret);
+
+            //affiche la réponse API
+            ret.forEach((code, i) => {
+                info.innerHTML += `${code}`;
+
+                if (ret.length > 1 && ret.length - 1 !== i) {
+                    info.innerHTML += '&nbsp;&mdash;&nbsp;';
+                }
+            });
+            break;
+        case defaultPath + 'getPos.html':
+            ret = await getPos();
+
+            //affiche la réponse API
+            info.innerHTML += `lat:&nbsp;${ret.lat}&nbsp;-&nbsp;&nbsp;long:&nbsp;${ret.lng}`;
+            break;
+        case defaultPath + 'getDistance.html':
+            ret = await getDistance();
+
+            info.innerHTML = `distance:&nbsp;${Math.round(ret.dist)}`;
+            break;
+        case defaultPath + 'getCitiesInRadius.html':
+            ret = await getCityInRadius();
+
+            //affiche la réponse API
+            ret.forEach((code, i) => {
+                info.innerHTML += `${code}`;
+
+                if (ret.length > 1 && ret.length - 1 !== i) {
+                    info.innerHTML += '&nbsp;&mdash;&nbsp;';
+                }
+                if(i % 5 === 0) {
+                    info.innerHTML += '<br/>';
+                }
+            });
+            break;
     }
 
     //la réponse de l'api
-    console.log(ret);
-    ret.forEach((ville, i) => {
-        info.innerHTML += `${ville.toUpperCase()}`;
-
-        if (ret.length > 1 && ret.length - 1 !== i) {
-            info.innerHTML += '&nbsp;&mdash;&nbsp;';
-        }
-    });
 
     infoContainer.style.display = 'flex';
     formulaire.style.display = 'none';
@@ -41,3 +80,47 @@ retour.addEventListener('click', () => {
     infoContainer.style.display = 'none';
     formulaire.style.display = 'flex';
 });
+
+const slugify = (city) => {
+    city.replace(/[-']/gm, ' ');
+
+    return city.toLowerCase();
+}
+
+const getVille = async () => {
+    //récupération du code postal
+    let codePostal = document.getElementById('code-postal').value.trim();
+
+    let res = await fetch(`${API_PATH}citiesinzipcode-${codePostal}`);
+    return await res.json();
+}
+const getCode = async () => {
+    let name = document.getElementById('slug').value.toLowerCase().trim();
+
+    let res = await fetch(`${API_PATH}cityname-${slugify(name)}`);
+    return await res.json()
+}
+const getPos = async () => {
+    let codePostal = document.getElementById('code-postal').value.trim();
+    let slug = document.getElementById('slug').value.toLowerCase().trim();
+
+    let res = await fetch(`${API_PATH}citypos-${codePostal + slugify(slug)}`)
+    return await res.json();
+}
+const getDistance = async () => {
+    let codePostal1 = document.getElementById('code-postal1').value.trim();
+    let slug1 = document.getElementById('slug1').value.toLowerCase().trim();
+    let codePostal2 = document.getElementById('code-postal2').value.trim();
+    let slug2 = document.getElementById('slug2').value.toLowerCase().trim();
+
+    let res = await fetch(`${API_PATH}citydist-${codePostal1 + slugify(slug1)}-${codePostal2 + slugify(slug2)}`);
+    return await res.json();
+}
+const getCityInRadius = async () => {
+    let codePostal = document.getElementById('code-postal').value.trim();
+    let slug = document.getElementById('slug').value.toLowerCase().trim();
+    let radius = document.getElementById('radius').value.toLowerCase().trim();
+
+    let res = await fetch(`${API_PATH}citiesinradius-${codePostal + slugify(slug)}-${radius}`)
+    return await res.json();
+}

@@ -4,19 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./front/style/main.css" />
+    <link rel="stylesheet" href="./front/style/pages.css">
     <title>Document</title>
   </head>
   <body>
-    <form id="formulaire">
-      <h1>Entrer une ville ou un code postal</h1>
-      <input type="text" placeholder="Votre ville" id="code-postal" />
-      <button type="submit">Envoyer</button>
-    </form>
-    <div id="infos-container">
-      <p id="infos"></p>
-      <button id="retour">Retour</button>
+    <div id="menu">
+      <h1>Veuillez choisir une option</h1>
+      <a href="/front/pages/getVille.html">Récupére la ville en fonction d'un code postal</a>
+      <a href="/front/pages/getCode.html">Récupère le code postal en fonction d'un nom de ville</a>
+      <a href="/front/pages/getPos.html">Récupérer la position d'une ville</a>
+      <a href="/front/pages/getDistance.html">Retourne la distance entre deux villes</a>
+      <a href="/front/pages/getCitiesInRadius.html">Renvoie toutes les villes dans un rayon en fonction d'une ville centre</a>
     </div>
-
     <script lang="text/javascript" src="./front/script/main.js"></script>
   </body>
 </html>
