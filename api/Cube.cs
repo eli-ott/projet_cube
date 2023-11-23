@@ -5,12 +5,12 @@ namespace Cube {
     public class Program {
         public static void Main(string[] args) {
 
-            var SpecialOrigin = "special_origin";
+            var SpecialOrigin = "cors_app";
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddCors(option => {
-                option.AddPolicy(name: SpecialOrigin, policy => {
-                    policy.WithOrigins("http://127.0.0.1:5500", "http://127.0.0.1:5023");
+                option.AddPolicy(SpecialOrigin, builder => {
+                    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
                 });
             });
 
