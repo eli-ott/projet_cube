@@ -58,7 +58,7 @@ namespace Cube {
 
             } // if ..
 
-            app.MapGet("/{zipCOde}", (string zipCode) => {
+            app.MapGet("/zipcode{zipCode}", (string zipCode) => {
 
                 // On vérifie s'il y a déjà un code postal enregistré
                 zipCodes.TryGetValue(zipCode, out List<string>? cityNamesOrNull);
@@ -67,6 +67,7 @@ namespace Cube {
                 return cityNamesOrNull ?? new() { "Aucune ville" };
                 
             }); // ..
+
             app.UseCors(SpecialOrigin);
             app.Run();
 
