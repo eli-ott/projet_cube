@@ -6,16 +6,14 @@ let retour = document.getElementById('retour');
 formulaire.addEventListener('submit', async (event) => {
     event.preventDefault();
 
-    console.log(info);
     info.innerHTML = '';
 
     //récupération du code postal
     let codePostal = document.getElementById('code-postal').value;
 
-    let res, ret;
-    //vérifie si l'input est un code postal ou un nom de ville
-    res = await fetch(`http://localhost:5023/citiesinzipcode-${codePostal}`);
-    ret = await res.json();
+    let ret;
+    
+
 
     //la réponse de l'api
     console.log(ret);
@@ -36,3 +34,10 @@ retour.addEventListener('click', () => {
     infoContainer.style.display = 'none';
     formulaire.style.display = 'flex';
 });
+
+const getVille = async () => {
+    let res = await fetch(`http://localhost:5023/citiesinzipcode-${codePostal}`);
+    let ret = await res.json();
+
+    return ret;
+}

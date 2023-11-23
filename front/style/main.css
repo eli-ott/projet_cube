@@ -7,6 +7,7 @@ body {
     height: 100%;
     width: 100%;
 
+    font-family: monospace;
     background: no-repeat center / cover url(../assets/background.svg);
 }
 
@@ -33,6 +34,7 @@ form {
 
     display: none;
 }
+
 #infos-container p {
     font-size: 21px;
 }
@@ -54,8 +56,13 @@ input:focus-visible {
     border-color: white;
 }
 
-button {
+button,
+a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
+    text-decoration: none;
 
     padding: 10px;
     min-width: 200px;
@@ -67,7 +74,8 @@ button {
     border: solid 1px black;
 }
 
-button:hover {
+button:hover,
+a:hover {
     background: none;
     color: white;
     border-color: white;
