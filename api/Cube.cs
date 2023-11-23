@@ -77,14 +77,38 @@ namespace Cube {
 
             GetCitiesInZipCode(app, zipCodes);
             GetCityPosition(app, positions);
+            GetZipCode(app, zipCodes);
             GetCityDistance(app, positions);
             GetCitiesInRadius(app, positions);
+
 
             app.UseCors(SpecialOrigin);
             app.Run();
 
         } // void ..
 
+        private static void GetZipCode(
+            WebApplication app,
+            Dictionary<string, List<string>> zipCodes
+        ) {
+            app.MapGet("/cityname{cityName}", (string cityName) => {
+            List<string> foundZipCodes = new List<string>();   
+            foreach(KeyValuePair<string, List<string>> entry in zipCodes){
+                string key = entry.Key;
+                List<string> value = entry.Value;
+
+                if(value.Contains(cityName)){
+                    foundZipCodes.Add(key);
+                }
+            }// foreach ..
+            if(foundZipCodes.Count == 0){
+                Console.WriteLine(cityName + " n'est associé(e) à aucun code postal");
+            } else {
+                Console.WriteLine(cityName + "est associé au code postal : " + foundZipCodes.ToString());
+            }
+            return foundZipCodes;
+            }); // app.MapGet ..
+        } // void ..
 
         /// <summary>
         /// Retourne les villes possédant un même code postal
