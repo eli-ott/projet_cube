@@ -15,6 +15,10 @@
   ```json
   "/citydist-59112annoeullin-59000lille" : { "dist" : 12.774501 }
   ```
+  `/cityname-{SLUG}` → renvois le(s) code(s) postal / postaux de la ville recherchée 
+  ```json
+  "/zipcodesfromcity-lille" : ["59160","59260","59000","59777","59800"]
+  ```
 - `/citiesinradius-{ZIP_CODE+SLUG}-{RADIUS}` → renvois la liste des villes autour d’une ville dans un rayon donné en kilomètre
   ```json
   "/citiesinradius-59000lille-4" : [
