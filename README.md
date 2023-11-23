@@ -1,5 +1,6 @@
 # Projet Cube (préparation)
 ## Requêtes
+### GET
 - `/citiesinzipcode-{ZIP_CODE}` → renvois les villes ayant ce code postal 
   ```json
   "/citiesinzipcode-59112" : [
@@ -31,4 +32,14 @@
     {"zipCode":"59790","cityName":"ronchin"},
     {"zipCode":"59139","cityName":"wattignies"}
   ]
+  ```
+### POST
+- `/newcity` → ajoute une nouvelle ville
+  ```json
+  {
+    "cityName": "New York"
+    "zipCode":  "12345",
+    "gpsLat":    40.7648,
+    "gpsLng":   -73.9808,
+  }
   ```
