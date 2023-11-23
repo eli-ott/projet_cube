@@ -66,7 +66,7 @@ formulaire.addEventListener('submit', async (event) => {
                     info.innerHTML += '&nbsp;&mdash;&nbsp;';
                 }
                 if (i % 5 === 0) {
-                    info.innerHTML += '<br/>';
+                    info.innerHTML += '<br/><br/>';
                 }
             });
             break;
@@ -100,7 +100,7 @@ const getVille = async () => {
 const getCode = async () => {
     let name = document.getElementById('slug').value.toLowerCase().trim();
 
-    let res = await fetch(`${API_PATH}cityname-${slugify(name)}`);
+    let res = await fetch(`${API_PATH}zipcodesfromcity-${slugify(name)}`);
     return await res.json()
 }
 const getPos = async () => {
