@@ -128,13 +128,12 @@ namespace Cube {
 
                 // On vérifie s'il y a déjà un code postal enregistré
                 zipCodes.TryGetValue(zipCode, out List<string>? cityNamesOrNull);
-
                 if (cityNamesOrNull is List<string> cityNames)
                      Console.WriteLine(cityNames.ToString() + " est / sont associé(es) au code postal : " + zipCode);
 
                 else Console.WriteLine(zipCode + " n'est associé à aucune ville !");
 
-                return cityNamesOrNull;
+                return cityNamesOrNull?.Select(cityName => (zipCode + cityName).ParseCityKey() );
                 
             }); // ..
         } // void ..
@@ -213,7 +212,6 @@ namespace Cube {
             app.MapGet("/citiesinradius-{args}", (string args) => {
 
                 string[] argsSplit = args.Split('-');
-
                 // On vérifie s'il y a bien deux clés
                 if (argsSplit.Length == 2)
                     // Puis si la clé de la ville centre est entregistrée
@@ -228,7 +226,7 @@ namespace Cube {
                     else Console.WriteLine("Le code de ville : " + argsSplit[0] + " n'est associé à aucune position GPS !");
                 else Console.WriteLine("Le nombre d'argument est incorrect (" + argsSplit.Length + "/2) !");
 
-                return null;
+                return null
             }); // ..
         } // void ..
 
