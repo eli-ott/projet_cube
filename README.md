@@ -18,5 +18,5 @@
   ```
   `/cityname-{SLUG}` → renvois le(s) code(s) postal / postaux de la ville recherchée 
   ```json
-  "/citynamelille" : ["59160","59260","59000","59777","59800"]
+  "/cityname-lille" : ["59160","59260","59000","59777","59800"]
   ```
