@@ -4,6 +4,14 @@ using Cube.Data;
 using MySql.Data.MySqlClient;
 
 namespace Cube {
+
+    public class Measure {
+        public float valeur     { get; set; }
+        public long  instant    { get; set; }
+        public int   idAppareil { get; set; }
+    } // class ..
+
+
     public class Program {
         public static void Main(string[] args) {
 
@@ -28,10 +36,35 @@ namespace Cube {
 
             if (connection.IsConnect()) {
 
-                app.UseCors(SpecialOrigin);
-                app.Run();
+
 
             } // void ..
-        } // List<string> ..
+
+            GetAllMeasures(app);
+            GetLastMeasure(app);
+            PostMeasure(app);
+
+            static void GetAllMeasures(WebApplication app){
+                app.MapGet("/measures-{idAppareil}", (int idAppareil) => {
+                    
+                }); //app.MapGet ..
+            } //void ..
+
+            static void GetLastMeasure(WebApplication app){
+                app.MapGet("/lastmeasure-{idAppareil}", (int idAppareil) => {
+
+                }); //app.MapGet ..
+            } //void ..
+
+            static void PostMeasure(WebApplication app){
+                app.MapPost("/newmeasure", (Measure measure) => {
+                    
+                }); //app.MapGet ..
+            } //void ..
+
+            app.UseCors(SpecialOrigin);
+            app.Run();
+
+        } // void ..
     } // class ..
 } // namespace ..
