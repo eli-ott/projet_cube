@@ -18,7 +18,7 @@
 ### POST
 - `/newmeasure` → Ajoute une nouvelle mesure
   ```json
-  "/newmeasures" : [
+  "/newmeasure" : [
     {
     "id_mesure": "12",
     "valeur": "12",
