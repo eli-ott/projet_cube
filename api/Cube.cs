@@ -6,9 +6,11 @@ using MySql.Data.MySqlClient;
 namespace Cube {
 
     public class Measure {
-        public float Mesure;
-        public string Date;
-    }
+        public float valeur     { get; set; }
+        public long  instant    { get; set; }
+        public int   idAppareil { get; set; }
+    } // class ..
+
 
     public class Program {
         public static void Main(string[] args) {
@@ -34,13 +36,9 @@ namespace Cube {
 
             if (connection.IsConnect()) {
 
-                app.UseCors(SpecialOrigin);
-                app.Run();
+
 
             } // void ..
-
-            string requete = String.Format("{\"Mesure\": {0}, \"Date\": {1}, \"IdAppareil\": {2} }", 0f, "dsdsd", 15);
-            Console.WriteLine("test");
 
             GetAllMeasures(app);
             GetLastMeasure(app);
@@ -64,6 +62,9 @@ namespace Cube {
                 }); //app.MapGet ..
             } //void ..
 
-        } // List<string> ..
+            app.UseCors(SpecialOrigin);
+            app.Run();
+
+        } // void ..
     } // class ..
 } // namespace ..
