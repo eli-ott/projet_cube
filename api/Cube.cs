@@ -22,26 +22,16 @@ namespace Cube {
 
             DBConnection connection = DBConnection.Instance();
             connection.Server       = "localhost";
-            connection.DatabaseName = "codes_postaux";
+            connection.DatabaseName = "cubes";
             connection.UserName     = "root";
             connection.Password     = "ESuKyuERu#2023";
 
             if (connection.IsConnect()) {
-                
-                string query = "";
-                MySqlCommand    command = new (query, connection.Connection);
-                MySqlDataReader reader  = command.ExecuteReader();
-                while(reader.Read()) {
 
-                connection.Close();
+                app.UseCors(SpecialOrigin);
+                app.Run();
 
-            } // if ..
-
-
-            app.UseCors(SpecialOrigin);
-            app.Run();
-
-        } // void ..
+            } // void ..
         } // List<string> ..
     } // class ..
 } // namespace ..
