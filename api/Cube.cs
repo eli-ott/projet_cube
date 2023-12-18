@@ -27,21 +27,11 @@ namespace Cube {
             connection.Password     = "ESuKyuERu#2023";
 
             if (connection.IsConnect()) {
-                
-                string query = "";
-                MySqlCommand    command = new (query, connection.Connection);
-                MySqlDataReader reader  = command.ExecuteReader();
-                while(reader.Read()) {
 
-                connection.Close();
+                app.UseCors(SpecialOrigin);
+                app.Run();
 
-            } // if ..
-
-
-            app.UseCors(SpecialOrigin);
-            app.Run();
-
-        } // void ..
+            } // void ..
         } // List<string> ..
     } // class ..
 } // namespace ..
