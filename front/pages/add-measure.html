@@ -20,13 +20,23 @@
         <h2>Ajouter ou modifier une mesure</h2>
         <h6>Pour modifier la mesure mettre le même identifiant</h6>
         <div>
-          <input type="text" placeholder="Nom de la mesure" />
-          <input type="text" placeholder="Unité de la mesure" />
-          <input type="number" placeholder="Limite minimale de la mesure" />
-          <input type="number" placeholder="Limite maximale de la mesure" />
+          <input type="text" id="nom_mesure" placeholder="Nom de la mesure" />
+          <input type="text" id="unit" placeholder="Unité de la mesure" />
+          <input
+            type="number"
+            id="min"
+            placeholder="Limite minimale de la mesure"
+          />
+          <input
+            type="number"
+            id="max"
+            placeholder="Limite maximale de la mesure"
+          />
           <button id="submit">Envoyer</button>
         </div>
       </div>
     </section>
+
+    <script lang="text/javascript" src="../script/add-meseaure.js"></script>
   </body>
 </html>
