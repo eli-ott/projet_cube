@@ -1,4 +1,4 @@
-# Projet Cube (préparation)
+# Projet Cube
 ## Requêtes
 ### GET
 - `/measures-{idAppareil}` → renvoi toutes les mesures de l'appareil
@@ -15,6 +15,7 @@
     {"mesure":"8","instant":"18-12-2023"}
   ]
   ```
+---
 ### POST
 - `/newmeasure` → Ajoute une nouvelle mesure
     ```json
@@ -41,3 +42,7 @@
       "limiteMax":   125            // Plus grande valeur acceptée
     }
   ```
+---
+### DELETE
+- `/device-{id}` → Supprime un appareil à l'aide de son identifiant
+- `/measuretype-{id}` → Supprime un appareil à l'aide de son identifiant
