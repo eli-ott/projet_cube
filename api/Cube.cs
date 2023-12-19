@@ -93,8 +93,13 @@ namespace Cube {
                     static void DeleteMeasureType(WebApplication app) => app.MapDelete("/measuretype-{id}", (int id) => DeleteMeasureTypeWithDevices(id));
 
 
+                // Envoie des données aléatoires toutes les 5 secondes.
+                _ = new Timer(async _ => await Simulation.Run(true), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+
+
                 app.UseCors(SpecialOrigin);
                 app.Run();
+
 
             } // void ..
         

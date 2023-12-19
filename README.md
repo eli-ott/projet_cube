@@ -47,9 +47,9 @@
 - `/device` → Mets à jour un appareil et l'ajoute s'il n'existe pas
     ```json
     {
-      "idAppareil":   396,               // IPV4 (16 bits) | ID (16 bits) → doit être identique à celui de l'appareil à modifier
+      "idAppareil":   396,            // IPV4 (32 bits) | ID (32 bits) → doit être identique à celui de l'appareil à modifier
       "nomAppareil": "RaspberryPI 4", // Nom permettant aux utilisateurs de distinguer les appareils
-      "idType":       2                  // Identifiant du type de mesure associé
+      "idType":       2               // Identifiant du type de mesure associé
     }
   ```
 ---
