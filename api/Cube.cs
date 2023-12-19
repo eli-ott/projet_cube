@@ -18,9 +18,9 @@ namespace Cube {
         ///
         /// </summary>
         public class MeasuresValues{
-            /** <summary>  </summary> **/ public string valeurs;
-            /** <summary>  </summary> **/ public string instants;
-            /** <summary>  </summary> **/ public string type;
+            /** <summary> Chaine de caractères composée des valeurs mesurées séparées par une virgule </summary> **/ public string valeurs;
+            /** <summary> Chaine de caractères composée des instants séparées par une virgule </summary> **/         public string instants;
+            /** <summary> Type de la mesure </summary> **/                                                           public string type;
         }
 
 
@@ -99,10 +99,10 @@ namespace Cube {
 
 
                     static void GetAllMeasures(WebApplication app){
-                app.MapGet("/measures-{idAppareil}", (int idAppareil) => {
-                    FindAllMeasures(idAppareil);
-                }); //app.MapGet ..
-            } //void ..
+                     app.MapGet("/measures-{idAppareil}", (int idAppareil) => {
+                        FindAllMeasures(idAppareil);
+                     }); //app.MapGet ..
+                    } //void ..
 
                     static void GetLastMeasure(WebApplication app){
                         app.MapGet("/lastmeasure-{idAppareil}", (int idAppareil) => {
@@ -139,9 +139,7 @@ namespace Cube {
 
 
 
-/// <summary>
-        /// Récupère toutes les mesures d'un appareil dans la base de donnée
-        /// </summary>
+        /// <summary> Récupère toutes les mesures d'un appareil dans la base de donnée </summary>
         /// <param name="idAppareil"> L'identifiant de l'appareil recherché </param>
         static Dictionary<string, MeasuresValues> FindAllMeasures(int idAppareil){
 
