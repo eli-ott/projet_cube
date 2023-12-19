@@ -83,6 +83,7 @@ namespace Cube {
                         }); //app.MapGet ..
                     } //void ..
 
+
                     static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => AddMeasure(measure));
                     static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => AddDevice(device));
                     static void PostMeasureType(WebApplication app) => app.MapPost("/newmeasuretype", (MeasureType measureType) => AddMeasureType(measureType));
@@ -94,7 +95,7 @@ namespace Cube {
 
 
                 // Envoie des données aléatoires toutes les 5 secondes.
-                _ = new Timer(async _ => await Simulation.Run(true), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+                _ = new Timer(async _ => await Simulation.Run(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
 
 
                 app.UseCors(SpecialOrigin);
@@ -118,16 +119,29 @@ namespace Cube {
                 if (!instance.IsConnect())
                     instance.Connection?.Open();
 
-                string query    = "INSERT INTO `mesure`(`valeur`, `instant`, `id_appareil`) VALUES (@valeur, @instant, @id_appareil)";
-                string dateTime = DateTimeOffset.FromUnixTimeSeconds(measure.instant).UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+                // On fait la moyenne des 4 précédentes mesures avant celle donnée.
+                string averageQuery = "SELECT AVG(subquery.valeur) FROM (SELECT valeur FROM `mesure` WHERE `instant` <= @instant ORDER BY `instant` DESC LIMIT 4) AS `subquery`";
+                string dateTime     = DateTimeOffset.FromUnixTimeSeconds(measure.instant).UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
 
+                float average;
+                using (var averageCommand = new MySqlCommand(averageQuery, instance.Connection)) {
+
+                    averageCommand.Parameters.AddWithValue("@instant", dateTime);
+                    object result = averageCommand.ExecuteScalar();
+                    average = result != DBNull.Value ? Convert.ToSingle(result) : measure.valeur;
+
+                } // using ..
+
+
+                // Puis on ajoute cette valeur dans le tableau.
+                string query = "INSERT INTO `mesure`(`valeur`, `instant`, `id_appareil`) VALUES (@valeur, @instant, @id_appareil)";
                 if (measure.valeur < 0f || measure.valeur > 1f)
                     ConsoleLogger.LogWarning("La mesure du " + dateTime + " n'est pas normalisée entre 0 et 1 ! Cela peut causer des problèmes lors de la lecture.");
 
                 try {
 
                     using var command = new MySqlCommand(query, instance.Connection);
-                    command.Parameters.AddWithValue("@valeur",      measure.valeur);
+                    command.Parameters.AddWithValue("@valeur",      (average + measure.valeur) * 0.5f);
                     command.Parameters.AddWithValue("@instant",     dateTime);
                     command.Parameters.AddWithValue("@id_appareil", measure.idAppareil);
                     command.ExecuteNonQuery();
