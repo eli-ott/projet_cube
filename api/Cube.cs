@@ -9,16 +9,16 @@ namespace Cube {
     //===============
 
         public class Measure {
-            /** <summary> Valeur  normalisée entre 0 et 1 </summary> **/                 public float valeur     { get; set; }
-            /** <summary> Nombre de secondes depuis 1970-01-01T00:00:00Z </summary> **/  public long  instant    { get; set; }
-            /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/     public int   idAppareil { get; set; }
+            /** <summary> Valeur  normalisée entre 0 et 1 </summary> **/                 public          float  valeur     { get; set; }
+            /** <summary> Nombre de secondes depuis 1970-01-01T00:00:00Z </summary> **/  public          long   instant    { get; set; }
+            /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/     public required string idAppareil { get; set; }
         } // class ..
 
         public class Device {
-            /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/                  public int    idAppareil  { get; set; }
-            /** <summary> Nom permettant aux utilisateurs de distinguer les appareils </summary> **/  public string nomAppareil { get; set; } = "Nouvel appareil";
-            /** <summary> Identifiant du type de mesure associé </summary> **/                        public int    idType      { get; set; }
-            /** <summary> Indique si le programme doit enregistrer ses mesures </summary> **/         public bool   activation  { get; set; } = true;
+            /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/                  public required string idAppareil  { get; set; }
+            /** <summary> Nom permettant aux utilisateurs de distinguer les appareils </summary> **/  public          string nomAppareil { get; set; } = "Nouvel appareil";
+            /** <summary> Identifiant du type de mesure associé </summary> **/                        public          int    idType      { get; set; }
+            /** <summary> Indique si le programme doit enregistrer ses mesures </summary> **/         public          bool   activation  { get; set; } = true;
         } // class ..
 
         public class MeasureType {
@@ -27,6 +27,7 @@ namespace Cube {
             /** <summary> Plus petite valeur acceptée </summary> **/                                        public float  limiteMin   { get; set; } = 0f;
             /** <summary> Plus grande valeur acceptée </summary> **/                                        public float  limiteMax   { get; set; } = 1f;
         } // class ..
+
 
 
         /// <summary>
@@ -108,8 +109,8 @@ namespace Cube {
 
                     static void PutDevice(WebApplication app) => app.MapPut("/device", (Device device) => UpdateDevice(device));
 
-                    static void DeleteDevice(WebApplication app)      => app.MapDelete("/device-{id}",      (int id) => DeleteDeviceWithMeasures(id));
-                    static void DeleteMeasureType(WebApplication app) => app.MapDelete("/measuretype-{id}", (int id) => DeleteMeasureTypeWithDevices(id));
+                    static void DeleteDevice(WebApplication app)      => app.MapDelete("/device-{id}",      (string id) => DeleteDeviceWithMeasures(id));
+                    static void DeleteMeasureType(WebApplication app) => app.MapDelete("/measuretype-{id}", (int id)    => DeleteMeasureTypeWithDevices(id));
 
 
                 // Envoie des données aléatoires toutes les 5 secondes.
@@ -139,9 +140,10 @@ namespace Cube {
 
                 string dateTime   = DateTimeOffset.FromUnixTimeSeconds(measure.instant).LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss");
                 string checkQuery = "SELECT COUNT(*) FROM `appareil` WHERE `id_appareil` = @id_appareil AND `activation`";
+                int    binaryID   = measure.idAppareil.ToDeviceBinaryID();
                 using (var checkCommand = new MySqlCommand(checkQuery, instance.Connection)) {
 
-                    checkCommand.Parameters.AddWithValue("@id_appareil", measure.idAppareil);
+                    checkCommand.Parameters.AddWithValue("@id_appareil", binaryID);
 
                     if (Convert.ToInt32(checkCommand.ExecuteScalar()) == 0)
                         return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible d'ajouter la mesure du " + dateTime + " ; aucun appareil en activation ne correspond !"));
@@ -172,7 +174,7 @@ namespace Cube {
                     using var command = new MySqlCommand(query, instance.Connection);
                     command.Parameters.AddWithValue("@valeur",      (average + measure.valeur) * 0.5f);
                     command.Parameters.AddWithValue("@instant",     dateTime);
-                    command.Parameters.AddWithValue("@id_appareil", measure.idAppareil);
+                    command.Parameters.AddWithValue("@id_appareil", binaryID);
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Ajout de la mesure du " + dateTime + ".");
 
@@ -195,7 +197,7 @@ namespace Cube {
                 try {
 
                     using var command = new MySqlCommand(query, instance.Connection);
-                    command.Parameters.AddWithValue("@id_appareil",  device.idAppareil);
+                    command.Parameters.AddWithValue("@id_appareil",  device.idAppareil.ToDeviceBinaryID());
                     command.Parameters.AddWithValue("@nom_appareil", device.nomAppareil);
                     command.Parameters.AddWithValue("@id_type",      device.idType);
                     command.Parameters.AddWithValue("@activation",   device.activation);
@@ -244,9 +246,10 @@ namespace Cube {
                     instance.Connection?.Open();
 
                 string checkQuery = "SELECT COUNT(*) FROM `appareil` WHERE `id_appareil` = @id_appareil";
+                int    binaryID   = device.idAppareil.ToDeviceBinaryID();
                 using (var checkCommand = new MySqlCommand(checkQuery, instance.Connection)) {
 
-                    checkCommand.Parameters.AddWithValue("@id_appareil", device.idAppareil);
+                    checkCommand.Parameters.AddWithValue("@id_appareil", binaryID);
 
                     if (Convert.ToInt32(checkCommand.ExecuteScalar()) == 0) {
 
@@ -262,7 +265,7 @@ namespace Cube {
                 try {
 
                     using var command = new MySqlCommand(query, instance.Connection);
-                    command.Parameters.AddWithValue("@id_appareil",  device.idAppareil);
+                    command.Parameters.AddWithValue("@id_appareil",  binaryID);
                     command.Parameters.AddWithValue("@nom_appareil", device.nomAppareil);
                     command.Parameters.AddWithValue("@id_type",      device.idType);
                     command.Parameters.AddWithValue("@activation",   device.activation);
@@ -278,7 +281,7 @@ namespace Cube {
             /// Supprim un appareil dans la base de donnée et toutes les mesures associées.
             /// </summary>
             /// <param name="id"> L'identifiant d'un appareil de mesure. </param>
-            static ApiResponse<string> DeleteDeviceWithMeasures(int id) {
+            static ApiResponse<string> DeleteDeviceWithMeasures(string id) {
 
                 DBConnection instance = DBConnection.Instance();
                 if (!instance.IsConnect())
