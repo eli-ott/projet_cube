@@ -204,9 +204,9 @@ namespace Cube {
                 using var command = new MySqlCommand(queryMeasure, instance.Connection);
                 command.Parameters.AddWithValue("@id_type", id);
                 command.ExecuteNonQuery();
-                ConsoleLogger.LogInfo("Suppression des mesures liées à l'appareil de type " + id + ".");
+                ConsoleLogger.LogInfo("Suppression des mesures liées aux appareils de type " + id + ".");
 
-            } catch { ConsoleLogger.LogError("Impossible de supprimer les mesures liées à l'appareil de type " + id + " !"); }
+            } catch { ConsoleLogger.LogError("Impossible de supprimer les mesures liées aux appareils de type " + id + " !"); }
 
 
             string queryDevice = "DELETE FROM `appareil` WHERE `id_type` = @id_type";
