@@ -2,12 +2,13 @@
  * Adding a new device using the API when the user clicks on 'Envoyer'
  */
 const addDevice = async () => {
-    let id_appareil = document.getElementById('id_appareil').value;
-    let nom_appareil = document.getElementById('nom_appareil').value;
-    let id_type_mesure = document.getElementById('id_type_mesure').value;
+    const id_appareil = document.getElementById('id_appareil').value;
+    const ip_appareil = document.getElementById('ip_appareil').value;
+    const nom_appareil = document.getElementById('nom_appareil').value;
+    const id_type_mesure = document.getElementById('id_type_mesure').value;
 
     const data = {
-        "idAppareil": id_appareil,
+        "idAppareil": ip_appareil + '-' + id_appareil,
         "nomAppareil": nom_appareil,
         "idType": id_type_mesure
     }
@@ -26,6 +27,7 @@ const addDevice = async () => {
         alert('Impossible d\'ajouter l\'appareil');
     }
     id_appareil = '';
+    ip_appareil = '';
     nom_appareil = '';
     id_type_mesure = '';
 }
