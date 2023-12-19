@@ -34,8 +34,8 @@ namespace Cube {
         /// <typeparam name="T"> Le type de donnée transférée </typeparam>
         public class ApiResponse<T>  {
 
-            /** <summary> Indique si la requête s'est terminée avec succès </summary> **/ public bool    success { get; set; }
-            /** <summary> Les données transférées. </summary> **/                         public T?      data    { get; set; }
+            /** <summary> Indique si la requête s'est terminée avec succès </summary> **/ public bool success { get; set; }
+            /** <summary> Les données transférées. </summary> **/                         public T?   data    { get; set; }
 
             public static ApiResponse<string> Error(string errorMessage) => new() { success = false, data = errorMessage };
             public static ApiResponse<T>      Success(T data)            => new() { success = true,  data = data };
