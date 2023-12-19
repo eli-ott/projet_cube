@@ -18,6 +18,7 @@ namespace Cube {
             /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/                  public int    idAppareil  { get; set; }
             /** <summary> Nom permettant aux utilisateurs de distinguer les appareils </summary> **/  public string nomAppareil { get; set; } = "Nouvel appareil";
             /** <summary> Identifiant du type de mesure associé </summary> **/                        public int    idType      { get; set; }
+            /** <summary> Indique si le programme doit enregistrer ses mesures </summary> **/         public bool   activation  { get; set; } = true;
         } // class ..
 
         public class MeasureType {
@@ -136,9 +137,20 @@ namespace Cube {
                 if (!instance.IsConnect())
                     instance.Connection?.Open();
 
+                string dateTime   = DateTimeOffset.FromUnixTimeSeconds(measure.instant).LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+                string checkQuery = "SELECT COUNT(*) FROM `appareil` WHERE `id_appareil` = @id_appareil AND `activation`";
+                using (var checkCommand = new MySqlCommand(checkQuery, instance.Connection)) {
+
+                    checkCommand.Parameters.AddWithValue("@id_appareil", measure.idAppareil);
+
+                    if (Convert.ToInt32(checkCommand.ExecuteScalar()) == 0)
+                        return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible d'ajouter la mesure du " + dateTime + " ; aucun appareil en activation ne correspond !"));
+
+                } // using ..
+                
+
                 // On fait la moyenne des 4 précédentes mesures avant celle donnée.
                 string averageQuery = "SELECT AVG(subquery.valeur) FROM (SELECT valeur FROM `mesure` WHERE `instant` <= @instant ORDER BY `instant` DESC LIMIT 4) AS `subquery`";
-                string dateTime     = DateTimeOffset.FromUnixTimeSeconds(measure.instant).LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss");
 
                 float average;
                 using (var averageCommand = new MySqlCommand(averageQuery, instance.Connection)) {
@@ -179,13 +191,14 @@ namespace Cube {
                 if (!instance.IsConnect())
                     instance.Connection?.Open();
 
-                string query = "INSERT INTO `appareil`(`id_appareil`, `nom_appareil`, `id_type`) VALUES (@id_appareil, @nom_appareil, @id_type)";
+                string query = "INSERT INTO `appareil`(`id_appareil`, `nom_appareil`, `id_type`, `activation`) VALUES (@id_appareil, @nom_appareil, @id_type, @activation)";
                 try {
 
                     using var command = new MySqlCommand(query, instance.Connection);
                     command.Parameters.AddWithValue("@id_appareil",  device.idAppareil);
                     command.Parameters.AddWithValue("@nom_appareil", device.nomAppareil);
                     command.Parameters.AddWithValue("@id_type",      device.idType);
+                    command.Parameters.AddWithValue("@activation",   device.activation);
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Ajout de " + device.nomAppareil + " à la liste des appareils.");
 
@@ -245,13 +258,14 @@ namespace Cube {
                 } // using ..
 
 
-                string query = "UPDATE `appareil` SET `nom_appareil` = @nom_appareil, `id_type` = @id_type WHERE `id_appareil` = @id_appareil";
+                string query = "UPDATE `appareil` SET `nom_appareil` = @nom_appareil, `id_type` = @id_type, `activation` = @activation WHERE `id_appareil` = @id_appareil";
                 try {
 
                     using var command = new MySqlCommand(query, instance.Connection);
                     command.Parameters.AddWithValue("@id_appareil",  device.idAppareil);
                     command.Parameters.AddWithValue("@nom_appareil", device.nomAppareil);
                     command.Parameters.AddWithValue("@id_type",      device.idType);
+                    command.Parameters.AddWithValue("@activation",   device.activation);
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Aucune interruption lors de la modificationde l'appareil à l'identifiant " + device.idAppareil + ".");
 
