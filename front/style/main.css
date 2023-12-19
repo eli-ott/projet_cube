@@ -1,7 +1,9 @@
-html, body {
+html,
+body {
     width: 100%;
     background: no-repeat center / cover url(../../assets/background.svg);
 }
+
 * {
     margin: 0;
     padding: 0;

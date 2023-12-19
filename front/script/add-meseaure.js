@@ -1,17 +1,17 @@
 /**
- * Adding a new device using the API when the user clicks on 'Envoyer'
+ * Adding a new measure using the API when the user clicks on 'Envoyer'
  */
 const addMeasure = async () => {
-    const nom_mesure = document.getElementById('nom_mesure');
-    const unit = document.getElementById('unit');
-    const min = document.getElementById('min');
-    const max = document.getElementById('max');
+    let nom_mesure = document.getElementById('nom_mesure').value;
+    let unit = document.getElementById('unit').value;
+    let min = document.getElementById('min').value;
+    let max = document.getElementById('max').value;
 
     const data = {
-        "nomType": nom_mesure.value,
-        "uniteMesure": unit.value,
-        "limiteMin": min.value,
-        "limiteMax": ma.valuex
+        "nomType": nom_mesure,
+        "uniteMesure": unit,
+        "limiteMin": min,
+        "limiteMax": max
     }
 
     const res = await fetch('http://localhost:5023/newmeasuretype', {
@@ -23,13 +23,14 @@ const addMeasure = async () => {
     });
     const ret = await res.text();
     if (ret.success === true) {
-        alert('Appareil ajouter avec succès');
+        alert('Type de mesure ajouter avec succès');
     } else {
-        alert('Impossible d\'ajouter l\'appareil');
+        alert('Impossible d\'ajouter le type de mesure');
     }
-    id_appareil.value = '';
-    nom_appareil.value = '';
-    id_type_mesure.value = '';
+    nom_mesure = '';
+    unit = '';
+    min = '';
+    max = '';
 }
 
 document.getElementById('submit').addEventListener('click', addMeasure);
