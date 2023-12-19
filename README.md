@@ -43,6 +43,16 @@
     }
   ```
 ---
+### PUT
+- `/device` → Mets à jour un appareil et l'ajoute s'il n'existe pas
+    ```json
+    {
+      "idAppareil":   396,               // IPV4 (16 bits) | ID (16 bits) → doit être identique à celui de l'appareil à modifier
+      "nomAppareil": "RaspberryPI 4", // Nom permettant aux utilisateurs de distinguer les appareils
+      "idType":       2                  // Identifiant du type de mesure associé
+    }
+  ```
+---
 ### DELETE
 - `/device-{id}` → Supprime un appareil à l'aide de son identifiant
 - `/measuretype-{id}` → Supprime un appareil à l'aide de son identifiant
