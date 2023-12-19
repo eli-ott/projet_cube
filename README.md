@@ -22,13 +22,13 @@
     {
       "valeur":     0.6927177, // Mesure normalisée entre 0 et 1
       "instant":    24770,     // Nombre de secondes depuis 1970-01-01T00:00:00Z
-      "idAppareil": 396        // IPV4 (16 bits) | ID (16 bits) 
+      "idAppareil": 396        // IPV4 (32 bits) | ID (32 bits) 
     }
   ```
 - `/newdevice` → Ajoute un nouvel appareil
     ```json
     {
-      "idAppareil":   396,               // IPV4 (16 bits) | ID (16 bits) 
+      "idAppareil":   396,               // IPV4 (32 bits) | ID (32 bits) 
       "nomAppareil": "RaspberryPI Zero", // Nom permettant aux utilisateurs de distinguer les appareils
       "idType":       2                  // Identifiant du type de mesure associé
     }
