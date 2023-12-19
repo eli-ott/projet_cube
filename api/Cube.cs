@@ -28,6 +28,23 @@ namespace Cube {
         } // class ..
 
 
+        /// <summary>
+        /// Une classe englobant les différents types de réponses de l'API
+        /// </summary>
+        /// <typeparam name="T"> Le type de donnée transférée </typeparam>
+        public class ApiResponse<T>  {
+
+            /** <summary> Indique si la requête s'est terminée avec succès </summary> **/ public bool    success { get; set; }
+            /** <summary> Les données transférées. </summary> **/                         public T?      data    { get; set; }
+
+            public static ApiResponse<string> Error(string errorMessage) => new() { success = false, data = errorMessage };
+            public static ApiResponse<T>      Success(T data)            => new() { success = true,  data = data };
+            public static ApiResponse<T>      Success()                  => new() { success = true,  data = default };
+
+        } // class ..
+
+
+
     //===================
     // P R O G R A M M E
     //===================
@@ -113,7 +130,7 @@ namespace Cube {
             /// Ajoute une mesure dans la base de donnée si l'appareil associé est déjà enregistré.
             /// </summary>
             /// <param name="measure"> Une mesure générique. </param>
-            static void AddMeasure(Measure measure) {
+            static ApiResponse<string> AddMeasure(Measure measure) {
 
                 DBConnection instance = DBConnection.Instance();
                 if (!instance.IsConnect())
@@ -121,7 +138,7 @@ namespace Cube {
 
                 // On fait la moyenne des 4 précédentes mesures avant celle donnée.
                 string averageQuery = "SELECT AVG(subquery.valeur) FROM (SELECT valeur FROM `mesure` WHERE `instant` <= @instant ORDER BY `instant` DESC LIMIT 4) AS `subquery`";
-                string dateTime     = DateTimeOffset.FromUnixTimeSeconds(measure.instant).UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+                string dateTime     = DateTimeOffset.FromUnixTimeSeconds(measure.instant).LocalDateTime.ToString("yyyy-MM-dd HH:mm:ss");
 
                 float average;
                 using (var averageCommand = new MySqlCommand(averageQuery, instance.Connection)) {
@@ -147,7 +164,8 @@ namespace Cube {
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Ajout de la mesure du " + dateTime + ".");
 
-                } catch { ConsoleLogger.LogError("Impossible d'ajouter la mesure du " + dateTime + " !"); }
+                } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible d'ajouter la mesure du " + dateTime + " !")); }
+                return ApiResponse<string>.Success();
             } // void ..
 
 
@@ -155,7 +173,7 @@ namespace Cube {
             /// Ajoute un appareil dans la base de donnée si le type de mesure associé est déjà enregistré.
             /// </summary>
             /// <param name="device"> Un appareil de mesure. </param>
-            static void AddDevice(Device device) {
+            static ApiResponse<string> AddDevice(Device device) {
 
                 DBConnection instance = DBConnection.Instance();
                 if (!instance.IsConnect())
@@ -171,7 +189,8 @@ namespace Cube {
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Ajout de " + device.nomAppareil + " à la liste des appareils.");
 
-                } catch { ConsoleLogger.LogError("Impossible d'ajouter " + device.nomAppareil + " à la liste des appareils !"); }
+                } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible d'ajouter " + device.nomAppareil + " à la liste des appareils !")); }
+                return ApiResponse<string>.Success();
             } // void ..
 
 
@@ -179,7 +198,7 @@ namespace Cube {
             /// Ajoute un type de mesure dans la base de donnée.
             /// </summary>
             /// <param name="measureType"> Un type de mesure. </param>
-            static void AddMeasureType(MeasureType measureType) {
+            static ApiResponse<string> AddMeasureType(MeasureType measureType) {
 
                 DBConnection instance = DBConnection.Instance();
                 if (!instance.IsConnect())
@@ -196,7 +215,8 @@ namespace Cube {
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Ajout de " + measureType.nomType + " à la liste des types de mesure.");
 
-                } catch { ConsoleLogger.LogError("Impossible d'ajouter " + measureType.nomType + " à la liste des types de mesure !"); }
+                } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible d'ajouter " + measureType.nomType + " à la liste des types de mesure !")); }
+                return ApiResponse<string>.Success();
             } // void ..
 
 
@@ -204,7 +224,7 @@ namespace Cube {
             /// Mets à jour un appareil dans la base de donnée et l'ajoute s'il n'existe pas.
             /// </summary>
             /// <param name="device"> L'appareil mis à jour. </param>
-            static void UpdateDevice(Device device) {
+            static ApiResponse<string> UpdateDevice(Device device) {
 
                 DBConnection instance = DBConnection.Instance();
                 if (!instance.IsConnect())
@@ -219,7 +239,7 @@ namespace Cube {
 
                         ConsoleLogger.LogWarning("Aucun appareil trouvé avec l'identifiant " + device.idAppareil + " pour la mise à jour !");
                         AddDevice(device);
-                        return;
+                        return ApiResponse<string>.Success();
 
                     } // if ..
                 } // using ..
@@ -235,7 +255,8 @@ namespace Cube {
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Aucune interruption lors de la modificationde l'appareil à l'identifiant " + device.idAppareil + ".");
 
-                } catch { ConsoleLogger.LogError("Interruption lors de la modificationde l'appareil à l'identifiant " + device.idAppareil + " !"); }
+                } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Interruption lors de la modificationde l'appareil à l'identifiant " + device.idAppareil + " !")); }
+                return ApiResponse<string>.Success();
             } // void ..
 
 
@@ -243,7 +264,7 @@ namespace Cube {
             /// Supprim un appareil dans la base de donnée et toutes les mesures associées.
             /// </summary>
             /// <param name="id"> L'identifiant d'un appareil de mesure. </param>
-            static void DeleteDeviceWithMeasures(int id) {
+            static ApiResponse<string> DeleteDeviceWithMeasures(int id) {
 
                 DBConnection instance = DBConnection.Instance();
                 if (!instance.IsConnect())
@@ -255,7 +276,7 @@ namespace Cube {
                     command.Parameters.AddWithValue("@id_appareil",  id);
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Suppression des mesures liées à l'identifiant " + id + ".");
-                } catch { ConsoleLogger.LogError("Impossible de supprimer les mesures liées à l'identifiant " + id + " !"); }
+                } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible de supprimer les mesures liées à l'identifiant " + id + " !")); }
 
 
                 string queryDevice = "DELETE FROM `appareil` WHERE `id_appareil` = @id_appareil";
@@ -264,7 +285,8 @@ namespace Cube {
                     command.Parameters.AddWithValue("@id_appareil",  id);
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Suppression de l'appareil à l'identifiant " + id + ".");
-                } catch { ConsoleLogger.LogError("Impossible de supprimer l'appareil à l'identifiant " + id + " !"); }
+                } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible de supprimer l'appareil à l'identifiant " + id + " !")); }
+                return ApiResponse<string>.Success();
             } // void ..
 
 
@@ -272,7 +294,7 @@ namespace Cube {
             /// Supprim un type de mesure dans la base de donnée et touts les appareils et mesures associés.
             /// </summary>
             /// <param name="id"> L'identifiant d'un type de mesure. </param>
-            static void DeleteMeasureTypeWithDevices(int id) {
+            static ApiResponse<string> DeleteMeasureTypeWithDevices(int id) {
 
                 DBConnection instance = DBConnection.Instance();
                 if (!instance.IsConnect())
@@ -287,7 +309,7 @@ namespace Cube {
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Suppression des mesures liées aux appareils de type " + id + ".");
 
-                } catch { ConsoleLogger.LogError("Impossible de supprimer les mesures liées aux appareils de type " + id + " !"); }
+                } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible de supprimer les mesures liées aux appareils de type " + id + " !")); }
 
 
                 string queryDevice = "DELETE FROM `appareil` WHERE `id_type` = @id_type";
@@ -298,7 +320,7 @@ namespace Cube {
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Suppression de l'appareil au type de mesure " + id + ".");
 
-                } catch { ConsoleLogger.LogError("Impossible de supprimer l'appareil au type de mesure " + id + " !"); }
+                } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible de supprimer l'appareil au type de mesure " + id + " !")); }
 
 
                 string queryMeasureType = "DELETE FROM `type_mesure` WHERE `id_type` = @id_type";
@@ -309,7 +331,8 @@ namespace Cube {
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Suppression du type de mesure à l'identifiant " + id + ".");
 
-                } catch { ConsoleLogger.LogError("Impossible de supprimer le type de mesure à l'identifiant " + id + " !"); }
+                } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible de supprimer le type de mesure à l'identifiant " + id + " !")); }
+                return ApiResponse<string>.Success();
             } // void ..
     } // class ..
 } // namespace ..

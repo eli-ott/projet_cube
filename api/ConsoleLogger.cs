@@ -5,12 +5,13 @@ namespace Cube {
         /// Permet d'écrire un log d'erreur dans la console.
         /// </summary>
         /// <param name="message"> Message qui doit apparaître dans la console. </param>
-        public static void LogError(string message) {
+        public static string LogError(string message) {
 
             ConsoleColor originalColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"ERROR: {DateTime.Now} - {message}");
             Console.ForegroundColor = originalColor;
+            return message;
 
         } // void ..
 
