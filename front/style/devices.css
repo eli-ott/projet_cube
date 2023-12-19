@@ -2,7 +2,9 @@ h2 {
     width: 100%;
     text-align: center;
 }
-.appareils-container, .mesures-container {
+
+.appareils-container,
+.mesures-container {
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
@@ -10,6 +12,7 @@ h2 {
 
     width: 100%;
 }
+
 .carte {
     margin: 25px;
     padding: 15px;
