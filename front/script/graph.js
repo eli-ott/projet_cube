@@ -14,7 +14,7 @@ window.addEventListener('load', () => {
             }, {
                 type: 'line',
                 label: 'Line Dataset',
-                data: [10, 20, 30, 40],
+                data: "12,51,85,74".split(','),
             }],
             labels: ['January', 'February', 'March', 'April']
         },
