@@ -52,6 +52,7 @@ namespace Cube {
             PostDevice(app);
             PostMeasureType(app);
 
+            DeleteDevice(app);
 
             static void GetAllMeasures(WebApplication app){
                 app.MapGet("/measures-{idAppareil}", (int idAppareil) => {
@@ -68,7 +69,7 @@ namespace Cube {
             static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => AddMeasure(measure));
             static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => AddDevice(device));
             static void PostMeasureType(WebApplication app) => app.MapPost("/newmeasuretype", (MeasureType measureType) => AddMeasureType(measureType));
-
+            static void DeleteDevice(WebApplication app)    => app.MapDelete("/device-{id}",  (int id)                  => DeleteDeviceWithMeasures(id));
 
             app.UseCors(SpecialOrigin);
             app.Run();
@@ -98,7 +99,8 @@ namespace Cube {
                 command.Parameters.AddWithValue("@instant",     dateTime);
                 command.Parameters.AddWithValue("@id_appareil", measure.idAppareil);
                 command.ExecuteNonQuery();
-            } catch (MySqlException _) { ConsoleLogger.LogError("Impossible d'ajouter la mesure du " + dateTime + " !"); }
+                ConsoleLogger.LogInfo("Ajout de la mesure du " + dateTime + ".");
+            } catch { ConsoleLogger.LogError("Impossible d'ajouter la mesure du " + dateTime + " !"); }
         } // void ..
 
 
@@ -120,7 +122,8 @@ namespace Cube {
                 command.Parameters.AddWithValue("@nom_appareil", device.nomAppareil);
                 command.Parameters.AddWithValue("@id_type",      device.idType);
                 command.ExecuteNonQuery();
-            } catch (MySqlException _) { ConsoleLogger.LogError("Impossible d'ajouter " + device.nomAppareil + " à la liste des appareils !"); }
+                ConsoleLogger.LogInfo("Ajout de " + device.nomAppareil + " à la liste des appareils.");
+            } catch { ConsoleLogger.LogError("Impossible d'ajouter " + device.nomAppareil + " à la liste des appareils !"); }
         } // void ..
 
 
@@ -143,7 +146,38 @@ namespace Cube {
                 command.Parameters.AddWithValue("@limite_min",   measureType.limiteMin);
                 command.Parameters.AddWithValue("@limite_max",   measureType.limiteMax);
                 command.ExecuteNonQuery();
-            } catch (MySqlException _) { ConsoleLogger.LogError("Impossible d'ajouter " + measureType.nomType + " à la liste des types de mesure !"); }
+                ConsoleLogger.LogInfo("Ajout de " + measureType.nomType + " à la liste des types de mesure.");
+            } catch { ConsoleLogger.LogError("Impossible d'ajouter " + measureType.nomType + " à la liste des types de mesure !"); }
+        } // void ..
+
+
+        /// <summary>
+        /// Supprim un appareil dans la base de donnée et toutes les mesures associées.
+        /// </summary>
+        /// <param name="id"> L'identifiant d'un appareil de mesure. </param>
+        static void DeleteDeviceWithMeasures(int id) {
+
+            DBConnection instance = DBConnection.Instance();
+            if (!instance.IsConnect())
+                instance.Connection?.Open();
+
+            string queryMeasures = "DELETE FROM `mesure` WHERE `id_appareil` = @id_appareil";
+            try {
+                using var command = new MySqlCommand(queryMeasures, instance.Connection);
+                command.Parameters.AddWithValue("@id_appareil",  id);
+                command.ExecuteNonQuery();
+                ConsoleLogger.LogInfo("Suppression des mesures liées à l'identifiant " + id + ".");
+            } catch { ConsoleLogger.LogError("Impossible de supprimer les mesures liées à l'identifiant " + id + " !"); }
+
+
+            string queryDevice = "DELETE FROM `appareil` WHERE `id_appareil` = @id_appareil";
+
+            try {
+                using var command = new MySqlCommand(queryDevice, instance.Connection);
+                command.Parameters.AddWithValue("@id_appareil",  id);
+                command.ExecuteNonQuery();
+                ConsoleLogger.LogInfo("Suppression de l'appareil à l'identifiant " + id + ".");
+            } catch { ConsoleLogger.LogError("Impossible de supprimer l'appareil à l'identifiant " + id + " !"); }
         } // void ..
     } // class ..
 } // namespace ..
