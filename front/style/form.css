@@ -1,0 +1,59 @@
+section {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+
+    height: 85vh;
+    width: 100%;
+}
+
+section div {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+
+    padding: 15px;
+    border-radius: 25px;
+
+    backdrop-filter: blur(15px) brightness(135%);
+}
+
+input {
+    outline: none;
+    padding: 10px;
+
+    font-size: 17px;
+    background: none;
+    color: black;
+    border: solid 1px black;
+}
+
+button#submit {
+    cursor: pointer;
+
+    min-width: 150px;
+    padding: 10px 25px;
+    transition: 0.15s;
+    font-size: 17px;
+
+    background: none;
+    color: black;
+    border: solid 1px black;
+}
+
+button#submit:hover {
+    background: none;
+}
+
+h2 {
+    font-size: 27px;
+}
+
+h6 {
+    font-size: 15px;
+    font-weight: 100;
+}
