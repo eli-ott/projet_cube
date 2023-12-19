@@ -1,9 +1,12 @@
-using System.Globalization;
-using System.Numerics;
 using Cube.Data;
 using MySql.Data.MySqlClient;
 
+
 namespace Cube {
+
+    //===============
+    // D O N N E E S
+    //===============
 
         public class Measure {
             /** <summary> Valeur  normalisée entre 0 et 1 </summary> **/                 public float valeur     { get; set; }
@@ -42,58 +45,79 @@ namespace Cube {
         } // class ..
 
 
-    public class Program {
-        public static void Main(string[] args) {
 
-            var SpecialOrigin = "cors_app";
-            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+    //===================
+    // P R O G R A M M E
+    //===================
 
-            builder.Services.AddCors(option => {
-                option.AddPolicy(SpecialOrigin, builder => {
-                    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+        public class Program {
+            public static void Main(string[] args) {
+
+                var SpecialOrigin = "cors_app";
+                WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+                builder.Services.AddCors(option => {
+                    option.AddPolicy(SpecialOrigin, builder => {
+                        builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+                    }); // ..
                 }); // ..
-            }); // ..
 
-            builder.Services.AddControllers();
-          
-            WebApplication app = builder.Build();
+                builder.Services.AddControllers();
+            
+                WebApplication app = builder.Build();
 
-            DBConnection connection = DBConnection.Instance();
-            connection.Server       = "localhost";
-            connection.DatabaseName = "cubes";
-            connection.UserName     = "root";
-            connection.Password     = "ESuKyuERu#2023";
-
-            if (connection.IsConnect()) {
+                DBConnection connection = DBConnection.Instance();
+                connection.Server       = "localhost";
+                connection.DatabaseName = "cubes";
+                connection.UserName     = "root";
+                connection.Password     = "ESuKyuERu#2023";
 
 
+                //=========================
+                // R E Q U Ê T E S   A P I
+                //=========================
 
-            } // void ..
+                    GetAllMeasures(app);
+                    GetLastMeasure(app);
+                    PostMeasure(app);
+                    PostDevice(app);
+                    PostMeasureType(app);
 
-            GetAllMeasures(app);
-            GetLastMeasure(app);
-            PostMeasure(app);
+                    PutDevice(app);
 
-            static void GetAllMeasures(WebApplication app){
-                app.MapGet("/measures-{idAppareil}", (int idAppareil) => {
-                    
-                }); //app.MapGet ..
-            } //void ..
+                    DeleteDevice(app);
+                    DeleteMeasureType(app);
 
-            static void GetLastMeasure(WebApplication app){
-                app.MapGet("/lastmeasure-{idAppareil}", (int idAppareil) => {
 
-                }); //app.MapGet ..
-            } //void ..
+                    static void GetAllMeasures(WebApplication app){
+                        app.MapGet("/measures-{idAppareil}", (int idAppareil) => {
+                            
+                        }); //app.MapGet ..
+                    } //void ..
 
-            static void PostMeasure(WebApplication app){
-                app.MapPost("/newmeasure", (Measure measure) => {
-                    
-                }); //app.MapGet ..
-            } //void ..
+                    static void GetLastMeasure(WebApplication app){
+                        app.MapGet("/lastmeasure-{idAppareil}", (int idAppareil) => {
 
-            app.UseCors(SpecialOrigin);
-            app.Run();
+                        }); //app.MapGet ..
+                    } //void ..
+
+
+                    static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => AddMeasure(measure));
+                    static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => AddDevice(device));
+                    static void PostMeasureType(WebApplication app) => app.MapPost("/newmeasuretype", (MeasureType measureType) => AddMeasureType(measureType));
+
+                    static void PutDevice(WebApplication app) => app.MapPut("/device", (Device device) => UpdateDevice(device));
+
+                    static void DeleteDevice(WebApplication app)      => app.MapDelete("/device-{id}",      (int id) => DeleteDeviceWithMeasures(id));
+                    static void DeleteMeasureType(WebApplication app) => app.MapDelete("/measuretype-{id}", (int id) => DeleteMeasureTypeWithDevices(id));
+
+
+                // Envoie des données aléatoires toutes les 5 secondes.
+                _ = new Timer(async _ => await Simulation.Run(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+
+
+                app.UseCors(SpecialOrigin);
+                app.Run();
 
 
             } // void ..
