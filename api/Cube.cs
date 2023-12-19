@@ -65,6 +65,8 @@ namespace Cube {
                     PostDevice(app);
                     PostMeasureType(app);
 
+                    PutDevice(app);
+
                     DeleteDevice(app);
                     DeleteMeasureType(app);
 
@@ -84,6 +86,8 @@ namespace Cube {
                     static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => AddMeasure(measure));
                     static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => AddDevice(device));
                     static void PostMeasureType(WebApplication app) => app.MapPost("/newmeasuretype", (MeasureType measureType) => AddMeasureType(measureType));
+
+                    static void PutDevice(WebApplication app) => app.MapPut("/device", (Device device) => UpdateDevice(device));
 
                     static void DeleteDevice(WebApplication app)      => app.MapDelete("/device-{id}",      (int id) => DeleteDeviceWithMeasures(id));
                     static void DeleteMeasureType(WebApplication app) => app.MapDelete("/measuretype-{id}", (int id) => DeleteMeasureTypeWithDevices(id));
@@ -174,6 +178,45 @@ namespace Cube {
                     ConsoleLogger.LogInfo("Ajout de " + measureType.nomType + " à la liste des types de mesure.");
 
                 } catch { ConsoleLogger.LogError("Impossible d'ajouter " + measureType.nomType + " à la liste des types de mesure !"); }
+            } // void ..
+
+
+            /// <summary>
+            /// Mets à jour un appareil dans la base de donnée et l'ajoute s'il n'existe pas.
+            /// </summary>
+            /// <param name="device"> L'appareil mis à jour. </param>
+            static void UpdateDevice(Device device) {
+
+                DBConnection instance = DBConnection.Instance();
+                if (!instance.IsConnect())
+                    instance.Connection?.Open();
+
+                string checkQuery = "SELECT COUNT(*) FROM `appareil` WHERE `id_appareil` = @id_appareil";
+                using (var checkCommand = new MySqlCommand(checkQuery, instance.Connection)) {
+
+                    checkCommand.Parameters.AddWithValue("@id_appareil", device.idAppareil);
+
+                    if (Convert.ToInt32(checkCommand.ExecuteScalar()) == 0) {
+
+                        ConsoleLogger.LogWarning("Aucun appareil trouvé avec l'identifiant " + device.idAppareil + " pour la mise à jour !");
+                        AddDevice(device);
+                        return;
+
+                    } // if ..
+                } // using ..
+
+
+                string query = "UPDATE `appareil` SET `nom_appareil` = @nom_appareil, `id_type` = @id_type WHERE `id_appareil` = @id_appareil";
+                try {
+
+                    using var command = new MySqlCommand(query, instance.Connection);
+                    command.Parameters.AddWithValue("@id_appareil",  device.idAppareil);
+                    command.Parameters.AddWithValue("@nom_appareil", device.nomAppareil);
+                    command.Parameters.AddWithValue("@id_type",      device.idType);
+                    command.ExecuteNonQuery();
+                    ConsoleLogger.LogInfo("Aucune interruption lors de la modificationde l'appareil à l'identifiant " + device.idAppareil + ".");
+
+                } catch { ConsoleLogger.LogError("Interruption lors de la modificationde l'appareil à l'identifiant " + device.idAppareil + " !"); }
             } // void ..
 
 
