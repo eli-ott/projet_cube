@@ -89,6 +89,9 @@ namespace Cube {
             string query    = "INSERT INTO `mesure`(`valeur`, `instant`, `id_appareil`) VALUES (@valeur, @instant, @id_appareil)";
             string dateTime = DateTimeOffset.FromUnixTimeSeconds(measure.instant).UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
 
+            if (measure.valeur < 0f || measure.valeur > 1f)
+                ConsoleLogger.LogWarning("La mesure du " + dateTime + " n'est pas normalisée entre 0 et 1 ! Cela peut causer des problèmes lors de la lecture.");
+
             try {
                 using var command = new MySqlCommand(query, instance.Connection);
                 command.Parameters.AddWithValue("@valeur",      measure.valeur);
