@@ -17,11 +17,27 @@
   ```
 ### POST
 - `/newmeasure` → Ajoute une nouvelle mesure
-  ```json
-  "/newmeasure" : [
+    ```json
     {
-    "valeur": "12",
-    "instant": "18-12-2023",
-  }
-  ]
+      "valeur":     0.6927177, // Mesure normalisée entre 0 et 1
+      "instant":    24770,     // Nombre de secondes depuis 1970-01-01T00:00:00Z
+      "idAppareil": 396        // IPV4 (16 bits) | ID (16 bits) 
+    }
+  ```
+- `/newdevice` → Ajoute un nouvel appareil
+    ```json
+    {
+      "idAppareil":   396,               // IPV4 (16 bits) | ID (16 bits) 
+      "nomAppareil": "RaspberryPI Zero", // Nom permettant aux utilisateurs de distinguer les appareils
+      "idType":       2                  // Identifiant du type de mesure associé
+    }
+  ```
+- `/newmeasuretype` → Ajoute un nouveau type de mesure
+    ```json
+    {
+      "nomType":     "Température", // Nom permettant aux utilisateurs de distinguer les types de mesure
+      "uniteMesure": "°C",          // Unité de mesure
+      "limiteMin":   -40,           // Plus petite valeur acceptée
+      "limiteMax":   125            // Plus grande valeur acceptée
+    }
   ```
