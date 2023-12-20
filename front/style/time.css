@@ -1,0 +1,8 @@
+#time {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 5px;
+
+    backdrop-filter: blur(15px) brightness(135%);
+}
