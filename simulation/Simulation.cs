@@ -42,7 +42,7 @@ namespace Cube {
         /// </summary>
         private static async Task PostRandomDevice() {
             Device device = new() {
-                idAppareil  = random.Next(0, 10),
+                idAppareil  = "192.168.0.32-" + random.Next(0, 10),
                 nomAppareil = "Device " + random.Next(),
                 idType      = random.Next(1, 10)
             }; // ..
@@ -58,7 +58,7 @@ namespace Cube {
             Measure measure = new() {
                 valeur     = random.NextSingle(),
                 instant    = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                idAppareil = random.Next(1, 10)
+                idAppareil = "192.168.0.32-" + random.Next(0, 10),
             }; // ..
 
             await PostData("http://localhost:5023/newmeasure", measure);
