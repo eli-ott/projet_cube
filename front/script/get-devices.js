@@ -6,12 +6,15 @@ const getDevices = async () => {
         method: 'GET'
     });
     const ret = await res.json();
-
+    
     if (ret.reussite === true) {
         showDevices(ret.donnee);
     }
 }
 getDevices();
+setInterval(() => {
+    getDevices();
+}, 15000);
 
 /**
  * Show all the devices
