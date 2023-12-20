@@ -9,7 +9,7 @@ const deleteDevice = async () => {
     });
 
     if (res.status === 200) {
-        alert('Appareil supprimer avec succès');
+        alert('Appareil supprimé avec succès');
     } else {
         alert('Impossible de supprimer l\'appareil');
     }
