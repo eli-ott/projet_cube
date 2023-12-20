@@ -44,29 +44,31 @@ const showDevices = (data) => {
         `;
 
         document.getElementsByClassName('appareils-container')[0].innerHTML += card;
+        document.getElementsByClassName('appareils-default')[0].style.display = 'none';
     });
 }
 
 /**
  * Show all the measures types to the user
- */
+*/
 const showMeasures = (data) => {
     data.forEach(measure => {
         const card = `
         <div class="carte mesure">
-            <div><u>ID de la mesure</u> : ${measure.idType}</div>
-            <br />
-            <div><u>Nom du type de la mesure</u> : ${measure.nomType}</div>
-            <br />
-            <div><u>Unité de la mesure</u> : ${measure.uniteMesure}</div>
-            <br />
-            <div><u>Limite minimale de la mesure</u> : ${measure.limiteMin}</div>
-            <br />
-            <div><u>Limite maximale de la mesure</u> : ${measure.limiteMax}</div>
-            <br />
+        <div><u>ID de la mesure</u> : ${measure.idType}</div>
+        <br />
+        <div><u>Nom du type de la mesure</u> : ${measure.nomType}</div>
+        <br />
+        <div><u>Unité de la mesure</u> : ${measure.uniteMesure}</div>
+        <br />
+        <div><u>Limite minimale de la mesure</u> : ${measure.limiteMin}</div>
+        <br />
+        <div><u>Limite maximale de la mesure</u> : ${measure.limiteMax}</div>
+        <br />
         </div>
-      `;
-
+        `;
+        
         document.querySelector('.mesures-container').innerHTML += card;
+        document.getElementsByClassName('mesures-default')[0].style.display = 'none';
     });
 }
