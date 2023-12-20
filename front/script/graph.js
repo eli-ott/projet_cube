@@ -49,3 +49,15 @@ const exportGraph = (event) => {
 }
 
 document.getElementById('export').addEventListener('click', exportGraph);
+
+/**
+ * Get all the meseaures from the WS
+ */
+const getAll = async () => {
+    const res = await fetch('http://localhost:5023/measures-1', {
+        method: "GET"
+    });
+    const ret = await res.json();
+    console.log(ret);
+};
+getAll();
