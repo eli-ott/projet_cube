@@ -10,6 +10,7 @@ main {
 }
 
 main .data-container {
+
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
@@ -19,16 +20,16 @@ main .data-container {
     height: 55vh;
     margin-bottom: 5%;
 
-    border: solid 1px white;
-    border-radius: 25px;
+    border-radius: 1em;
     backdrop-filter: blur(15px) brightness(135%);
+
 }
 
 main .data-container .infos {
-    width: 35%;
-    height: 100%;
+    width:  35%;
+    height: 90%;
 
-    border-right: solid 1px black;
+    border-right: solid 2px rgba(0, 0, 0, 0.25);
 }
 
 .infos>* {
@@ -38,7 +39,7 @@ main .data-container .infos {
 }
 
 .info-title {
-    font-size: 23px;
+    font-size: 3vmin;
     text-align: center;
     display: block;
 
@@ -47,19 +48,21 @@ main .data-container .infos {
 
 .infos .value-info button {
     cursor: pointer;
+    font-weight: bold;
 
     width: 100%;
-    padding: 5px;
-    font-size: 17px;
 
-    background: none;
-    border: solid 1px black;
+    border: none;
     color: black;
     transition: 0.25s;
+
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 0.5em;
+    padding:         1em;
 }
 
 .infos .value-info button:hover {
-    background: white;
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .infos .value-info .info-title {
@@ -67,7 +70,7 @@ main .data-container .infos {
 }
 
 .graph-container {
-    padding: 15px;
+    padding: 1vw;
     width: 65%;
     height: 100%;
 }

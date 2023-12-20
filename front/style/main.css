@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Karla:wght@300;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Karla:wght@300;400&display=swap');
 
 html,
 body {
@@ -6,23 +6,9 @@ body {
     background: no-repeat center / cover url(../../assets/background.svg);
 }
 
-nav a {
-    font-weight: bold;
-    text-decoration: none;
-    background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 0.5em;
-    padding:         1em;
-}
-
-nav a:hover { background-color: rgba(255, 255, 255, 0.2); }
-
-a {
-    text-decoration: dotted;
-}
-
 * {
     margin: 0;
-    padding: 0;
     box-sizing: border-box;
     font-family: 'Karla', sans-serif;
+    font-size:   2vmin
 }
