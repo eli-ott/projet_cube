@@ -16,8 +16,8 @@ namespace Cube {
         } // class ..
 
         public class MeasureByDevice{
-            /** <summary> Chaîne de caractère composée de valeurs séparées par une virgule </summary> **/ public string valeur  { get; set; }
-            /** <summary> Chaîne de caractère composée de dates séparées par une virgule </summary> **/   public string instant { get; set; }
+            /** <summary> Chaîne de caractère composée de valeurs séparées par une virgule </summary> **/ public required string valeur  { get; set; }
+            /** <summary> Chaîne de caractère composée de dates séparées par une virgule </summary> **/   public required string instant { get; set; }
         } // class ..
 
         public class Device {
@@ -88,6 +88,8 @@ namespace Cube {
                 //=========================
 
                     GetAllMeasures(app);
+                    GetDevices(app);
+                    GetMeasureTypes(app);
                    
                     PostMeasure(app);
                     PostDevice(app);
@@ -159,10 +161,16 @@ namespace Cube {
             } // ApiResponse ..
 
 
-            /// <summary> 
-            /// Récupère toutes les mesures d'un appareil dans la base de donnée 
+            /// <summary>
+            /// Récupère les mesures et les instants associés groupés par type et par appareil.
             /// </summary>
-            static Dictionary<string, Dictionary<string, MeasureByDevice>> FindAllMeasures(string dateDebut, string dateFin){
+            /// <param name="dateDebut"> Date de début de la plage horaire sous le format yyyy-MM-dd HH:mm:ss. </param>
+            /// <param name="dateFin"><  Date de fin de la plage horaire sous le format yyyy-MM-dd HH:mm:ss. /param>
+            /// <returns></returns>
+            static ApiResponse<Dictionary<string, Dictionary<string, MeasureByDevice>>> FindAllMeasures(
+                string dateDebut,
+                string dateFin
+            ){
 
                 DBConnection instance = DBConnection.Instance();
                 if (!instance.IsConnect())
@@ -172,32 +180,48 @@ namespace Cube {
                 string query = "SELECT GROUP_CONCAT((valeur*(type_mesure.limite_max-type_mesure.limite_min)+type_mesure.limite_min)) as mesures, GROUP_CONCAT(instant) as instants, appareil.id_appareil, appareil.id_type, nom_type, unite_mesure FROM mesure JOIN appareil ON mesure.instant >= @dateDebut AND mesure.instant <= @dateFin AND mesure.id_appareil = appareil.id_appareil JOIN type_mesure ON appareil.id_type = type_mesure.id_type GROUP BY appareil.id_appareil";
 
                 /// Dictionnaire qui à pour clé l'id_type et pour valeur le dictionnaire measuresByDevice 
-                Dictionary<string, Dictionary<string, MeasureByDevice>> measuresByType = new Dictionary<string, Dictionary<string, MeasureByDevice>>();
+                Dictionary<string, Dictionary<string, MeasureByDevice>> measuresByType = new ();
 
                 try {
-                    using var command = new MySqlCommand(query, instance.Connection);
+
+                    using MySqlCommand command = new (query, instance.Connection);
                     command.Parameters.AddWithValue("@dateDebut", dateDebut.Replace('_', ' '));
-                    command.Parameters.AddWithValue("@dateFin", dateFin.Replace('_', ' '));
-                    using var reader = command.ExecuteReader();
-                    while (reader.Read()){
+                    command.Parameters.AddWithValue("@dateFin",   dateFin.Replace('_', ' '));
+                    MySqlDataReader reader = command.ExecuteReader();
+
+                    while (reader.Read()) {
+
                         /// Si l'id_type est présent dans le dictionnaire measuresByType
                         if (measuresByType.TryGetValue(reader.GetString("id_type"), out Dictionary<string, MeasureByDevice>? measuresByDevice)){
+
                             /// Ajoute au dictionnaire measuresByDevice en clé l'id_appareil et en valeur la class MeasureByDevice qui contient les mesures et les instants
-                            measuresByDevice.Add(reader.GetString("id_appareil"), new(){valeur = reader.GetString("mesures"), instant = reader.GetString("instants")});
-                        /// Si l'id_type n'est pas présent dans le dictionnaire measuresByType
+                            measuresByDevice.Add(reader.GetString("id_appareil"), new() {
+                                valeur  = reader.GetString("mesures"),
+                                instant = reader.GetString("instants")
+                            }); // ..
                         } else {
-                            /// Ajoute au dictionnaire measuresByDevice en clé l'id_appareil et en valeur la class MeasureByDevice qui contient les mesures et les instants
-                            measuresByDevice = new Dictionary<string, MeasureByDevice> {
-                                { reader.GetString("id_appareil"), new() { valeur = reader.GetString("mesures"), instant = reader.GetString("instants") } }
-                            };
+
+                            /// On ajoute au dictionnaire measuresByDevice en clé l'id_appareil et en valeur la class MeasureByDevice qui contient les mesures et les instants
+                            measuresByDevice = new Dictionary<string, MeasureByDevice> {{
+                                reader.GetString("id_appareil"),
+                                new() {
+                                    valeur  = reader.GetString("mesures"),
+                                    instant = reader.GetString("instants")
+                                } // ..
+                            }}; // ..
+
                             /// Puis ajoute au dictionnaire measureByType en clé l'id_type et en valeur le dictionnaire measuresByDevice
-                            measuresByType.Add(reader.GetString("id_type"), measuresByDevice);                    
-                        }
-                    } reader.Close();
-                    return measuresByType;
-                } catch (MySqlException _) { ConsoleLogger.LogError("Impossible d'afficher les mesures !"); }
-                return measuresByType;
-            }
+                            measuresByType.Add(reader.GetString("id_type"), measuresByDevice);     
+
+                        } // if ..
+                    } // while ..
+                    
+                    reader.Close();
+
+                    return ApiResponse<Dictionary<string, Dictionary<string, MeasureByDevice>>>.Success(measuresByType);
+                } catch { return ApiResponse<Dictionary<string, Dictionary<string, MeasureByDevice>>>.Error(ConsoleLogger.LogError("Impossible d'afficher les mesures !")); }
+            } // ApiResponse ..
+
 
             /// <summary>
             /// Ajoute une mesure dans la base de donnée si l'appareil associé est déjà enregistré.
