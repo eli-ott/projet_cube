@@ -9,7 +9,7 @@ const deleteMeseaure = async () => {
     });
 
     if (res.status === 200) {
-        alert('Type de mesure supprimer avec succès');
+        alert('Type de mesure supprimé avec succès');
     } else {
         alert('Impossible de supprimer le type de mesure');
     }

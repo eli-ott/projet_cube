@@ -20,7 +20,7 @@ const deactivateDevice = async () => {
     });
     const ret = await res.json();
     if (ret.reussite === true) {
-        alert('Appareil désactiver avec succès');
+        alert('Appareil désactivé avec succès');
     } else {
         alert('Impossible de désactiver l\'appareil');
     }
