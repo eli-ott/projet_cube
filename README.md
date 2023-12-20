@@ -50,6 +50,7 @@ Toutes les reqûetes retournent une `ApiResponse` à leur fin sous le format sui
       }
     ]
 ```
+- `/serverip` → Renvoi l'IPV4 du serveur
 ---
 ### POST
 Ces requêtes permettent d'ajouter des données au programme via l'API.
