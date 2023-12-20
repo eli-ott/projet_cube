@@ -15,7 +15,8 @@ const checkConnect = async () => {
     }
 }
 if (window.location.href !== 'http://localhost:5500/front/pages/connect.html' &&
-    window.location.href !== 'http://localhost:5500/front/pages/data.html') {
+    window.location.href !== 'http://localhost:5500/front/pages/data.html' &&
+    window.location.href !== 'http://localhost:5500/front/pages/new-user.html') {
     checkConnect();
 }
 

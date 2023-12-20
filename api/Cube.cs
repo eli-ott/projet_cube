@@ -56,6 +56,12 @@ namespace Cube {
 
         } // class ..
 
+        public class Utilisateur {
+            /** <summary> Identifiant auto incrémenté </summary> **/        public int?    idUser      { get; set; }
+            /** <summary> Nom d'utilisateur </summary> **/                  public required string username     { get; set; }
+            /** <summary> Le mot de passe de l'utilisateur </summary> **/   public required string password { get; set; }
+        }
+
 
 
     //===================
@@ -98,6 +104,7 @@ namespace Cube {
                     PostMeasure(app);
                     PostDevice(app);
                     PostMeasureType(app);
+                    PostUtilisateur(app);
 
                     PutDevice(app);
 
@@ -121,6 +128,7 @@ namespace Cube {
                     static void GetDevices(WebApplication app)      => app.MapGet("devices",      () => ReadDevices());
                     static void GetMeasureTypes(WebApplication app) => app.MapGet("measuretypes", () => ReadMeasureTypes());
 
+                    static void PostUtilisateur(WebApplication app) => app.MapPost("/newuser",        (Utilisateur utilisateur) => AddUser(utilisateur));
                     static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => AddMeasure(measure));
                     static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => AddDevice(device));
                     static void PostMeasureType(WebApplication app) => app.MapPost("/newmeasuretype", (MeasureType measureType) => AddMeasureType(measureType));
@@ -260,6 +268,28 @@ namespace Cube {
                 } catch { return ApiResponse<Any>.Error(ConsoleLogger.LogError("Impossible d'ajouter " + device.nomAppareil + " à la liste des appareils !")); }
                 return ApiResponse<Any>.Success();
             } // void ..
+
+            /// <summary>
+            /// Peremt d'ajouter un nouvel utilisateur
+            /// </summary>
+            /// <param name="user">Les données de l'utilisateur</param>
+            /// <returns>Si l'insertion à réussi</returns>
+            static ApiResponse<Any> AddUser(Utilisateur user) {
+                DBConnection instance = DBConnection.Instance();
+                if(!instance.IsConnect())
+                    instance.Connection?.Open();
+
+                string query = "INSERT INTO `utilisateurs` (`username`, `password`) VALUES (@username, @password)";
+                try {
+                    using MySqlCommand command = new MySqlCommand(query, instance.Connection);
+                    command.Parameters.AddWithValue("@username", user.username);
+                    command.Parameters.AddWithValue("@password", user.password);
+                    command.ExecuteNonQuery();
+                    ConsoleLogger.LogInfo("Ajout de " + user.username + " à la liste des utilisateurs");
+                    
+                } catch { return ApiResponse<Any>.Error(ConsoleLogger.LogError("Impossible d'ajouter " + user.username + " à la liste des utilisateurs !")); }
+                return ApiResponse<Any>.Success();
+            }
 
 
             /// <summary>
