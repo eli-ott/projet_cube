@@ -1,20 +1,32 @@
 # Projet Cube
 ## Requêtes
+
+Toutes les reqûetes retournent une `ApiResponse` à leur fin sous le format suivant.
+```json
+{
+  "reussite": <bool>,
+  "donnee":   <Any?>,
+  "message":  <string?>
+}
+```
+
 ### GET
-- `/measures-{idAppareil}` → renvoi toutes les mesures de l'appareil
+- `/measures/{datedebut}/{datefin}` → Renvoi toutes les mesures en fonction de leur appareil et de leur type dans une plage horaire donnée
   ```json
-  "/measures-15" : [
-    {"mesure":"15","instant":"18-12-2023"},
-    {"mesure":"18","instant":"18-12-2023"},
-    {"mesure":"8","instant":"18-12-2023"}
-  ]
-  ```
-  `/lastmeasure-{idAppareil}` → renvoi la dernière mesure de l'appareil
-  ```json
-  "/lastmeasure-15" : [
-    {"mesure":"8","instant":"18-12-2023"}
-  ]
-  ```
+  {
+    "1": {
+      "61209234": {
+        "valeurs":  "0.5554475689992842,0.4896293096661193",
+        "instants": "2023-12-20 13:33:10,2023-12-20 15:23:31,"
+      }
+    },
+    "2": {
+      "1208923": {
+        "valeurs":  "12.23121234",
+        "instants": "2023-12-19 15:31:00"
+      }
+    }
+  }
 - `/devices` → Renvoi la liste des appareils
 ```json
     [
@@ -40,14 +52,7 @@
 ```
 ---
 ### POST
-Ces requêtes permettent d'ajouter des données au programme via l'API. Elles retournent une `ApiResponse` à leur fin sous le format suivant.
-```json
-{
-  "reussite": <bool>,
-  "donnee":   <Any?>,
-  "message":  <string?>
-}
-```
+Ces requêtes permettent d'ajouter des données au programme via l'API.
 
 - `/newmeasure` → Ajoute une nouvelle mesure
     ```json
@@ -100,7 +105,7 @@ CREATE TABLE `type_mesure` (
   `nom_type`     varchar(50) NOT NULL,
   `unite_mesure` varchar(15) NOT NULL,
   `limite_min`   float       NOT NULL,
-	`limite_max`   float      NOT NULL,
+	`limite_max`   float       NOT NULL,
   PRIMARY KEY (`id_type`),
   UNIQUE KEY `nom_type_unique` (`nom_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
