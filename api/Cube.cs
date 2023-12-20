@@ -33,7 +33,7 @@ namespace Cube {
         } // class ..
 
         public class MeasureType {
-            /** <summary> Identifiant auto </summary> **/                                                   public int?    idType      { get; set; }
+            /** <summary> Identifiant auto incrémenté </summary> **/                                        public int?    idType      { get; set; }
             /** <summary> Nom permettant aux utilisateurs de distinguer les types de mesure </summary> **/  public string? nomType     { get; set; } = "Nouveau type de mesure";
             /** <summary> Unité de mesure </summary> **/                                                    public string? uniteMesure { get; set; }
             /** <summary> Plus petite valeur acceptée </summary> **/                                        public float   limiteMin   { get; set; } = 0f;
