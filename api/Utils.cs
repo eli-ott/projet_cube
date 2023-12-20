@@ -1,3 +1,6 @@
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+
 namespace Cube.Data {
     public static class Utils {
 
@@ -30,5 +33,19 @@ namespace Cube.Data {
         public static string ToDeviceStringID(this long self) =>
             $"{self & 0xFF}.{(self >> 8) & 0xFF}.{(self >> 16) & 0xFF}.{(self >> 24) & 0xFF}-{self >> 32}";
 
+
+        /// <summary>
+        /// Permets d'obtenir une adresse IPV4 en fonction d'un type d'interface réseau.
+        /// </summary>
+        /// <returns> L'adresse IPV4 sous forme de chaîne de caractère pouvant être nulle en cas d'échec. </returns>
+        public static string? GetLocalIPv4() {
+            foreach (NetworkInterface item in NetworkInterface.GetAllNetworkInterfaces())
+                if (item.NetworkInterfaceType == NetworkInterfaceType.Ethernet && item.OperationalStatus == OperationalStatus.Up)
+                    foreach (UnicastIPAddressInformation ip in item.GetIPProperties().UnicastAddresses)
+                        if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                            return ip.Address.ToString();
+
+            return null;
+        } // string ..
     } // class ..
 } // namespace ..

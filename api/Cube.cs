@@ -90,6 +90,7 @@ namespace Cube {
                     GetAllMeasures(app);
                     GetDevices(app);
                     GetMeasureTypes(app);
+                    GetIPV4(app);
                    
                     PostMeasure(app);
                     PostDevice(app);
@@ -104,6 +105,7 @@ namespace Cube {
                     static void GetAllMeasures(WebApplication app)  => app.MapGet("/measures/{datedebut}/{datefin}", (string dateDebut, string dateFin) => EnsureThreadSafety(args => FindAllMeasures(dateDebut, dateFin)));
                     static void GetDevices(WebApplication app)      => app.MapGet("devices",      () => EnsureThreadSafety(args => ReadDevices()));
                     static void GetMeasureTypes(WebApplication app) => app.MapGet("measuretypes", () => EnsureThreadSafety(args => ReadMeasureTypes()));
+                    static void GetIPV4(WebApplication app)         => app.MapGet("serverip", () => ReadIPV4());
 
                     static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => EnsureThreadSafety(args => AddMeasure(measure)));
                     static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => EnsureThreadSafety(args => AddDevice(device)));
@@ -401,6 +403,16 @@ namespace Cube {
 
                         return ApiResponse<List<MeasureType>>.Success(measureTypes);
                     } catch { return ApiResponse<List<MeasureType>>.Error(ConsoleLogger.LogError("Impossible de lire la liste des types de mesure !")); }
+            } // List<MeasureType> ..
+
+
+            /// <summary>
+            /// Récupère l'IPV4 du serveur.'
+            /// </summary>
+            /// <returns> L'IPV4 du serveur'. </returns>
+            static ApiResponse<string> ReadIPV4() {
+                if (Utils.GetLocalIPv4() is string ipv4) return ApiResponse<string>.Success(ipv4);
+                else                                     return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible de trouver l'IPV4 du réseau Ethernet !"));
             } // List<MeasureType> ..
 
 
