@@ -16,10 +16,10 @@ namespace Cube {
         } // class ..
 
         public class Device {
-            /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/                  public required string idAppareil  { get; set; }
-            /** <summary> Nom permettant aux utilisateurs de distinguer les appareils </summary> **/  public          string nomAppareil { get; set; } = "Nouvel appareil";
-            /** <summary> Identifiant du type de mesure associé </summary> **/                        public          int    idType      { get; set; }
-            /** <summary> Indique si le programme doit enregistrer ses mesures </summary> **/         public          bool   activation  { get; set; } = true;
+            /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/                  public required string  idAppareil  { get; set; }
+            /** <summary> Nom permettant aux utilisateurs de distinguer les appareils </summary> **/  public          string? nomAppareil { get; set; } = "Nouvel appareil";
+            /** <summary> Identifiant du type de mesure associé </summary> **/                        public          int?    idType      { get; set; }
+            /** <summary> Indique si le programme doit enregistrer ses mesures </summary> **/         public          bool    activation  { get; set; } = true;
         } // class ..
 
         public class MeasureType {
@@ -270,18 +270,22 @@ namespace Cube {
                     } // using ..
 
 
-                    string query = "UPDATE `appareil` SET `nom_appareil` = @nom_appareil, `id_type` = @id_type, `activation` = @activation WHERE `id_appareil` = @id_appareil";
-                    try {
+                    string query = "UPDATE `appareil` SET"
+                    + (device.nomAppareil is not null ? " `nom_appareil` = @nom_appareil, " : "")
+                    + (device.idType      is int    ?   " `id_type` = @id_type, "           : "")
+                    + " `activation` = @activation WHERE `id_appareil` = @id_appareil";
+
+                    // try {
 
                         using var command = new MySqlCommand(query, instance.Connection);
                         command.Parameters.AddWithValue("@id_appareil",  binaryID);
-                        command.Parameters.AddWithValue("@nom_appareil", device.nomAppareil);
-                        command.Parameters.AddWithValue("@id_type",      device.idType);
+                        if (device.nomAppareil is string nomAppareil) command.Parameters.AddWithValue("@nom_appareil", nomAppareil);
+                        if (device.idType      is int    idType)      command.Parameters.AddWithValue("@id_type",      idType);
                         command.Parameters.AddWithValue("@activation",   device.activation);
                         command.ExecuteNonQuery();
                         ConsoleLogger.LogInfo("Aucune interruption lors de la modificationde l'appareil à l'identifiant " + device.idAppareil + ".");
 
-                    } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Interruption lors de la modificationde l'appareil à l'identifiant " + device.idAppareil + " !")); }
+                    // } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Interruption lors de la modificationde l'appareil à l'identifiant " + device.idAppareil + " !")); }
                     return ApiResponse<string>.Success();
                 } else return ApiResponse<string>.Error(ConsoleLogger.LogError(device.idAppareil + " n'est pas un identifiant sous le format IPV4-ID !"));
             } // void ..
