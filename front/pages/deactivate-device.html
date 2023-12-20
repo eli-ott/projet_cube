@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../style/main.css" />
+    <link rel="stylesheet" href="../style/nav.css" />
+    <link rel="stylesheet" href="../style/form.css" />
+    <title>Désactiver un appareil</title>
+  </head>
+  <body>
+    <nav>
+      <a href="./delete-meseaure.html">Supprimer un type de mesure</a>
+      <a href="./delete-device.html">Supprimer un appareil</a>
+      <a href="./add-device.html">Ajouter un appareil</a>
+      <a href="./show-devices.html">Voir les appareils enregistrer</a>
+      <a href="./data.html">Voir les données</a>
+      <a href="./add-measure.html">Ajoute un type de mesure</a>
+      <a href="/connect.html">Se connecter</a>
+    </nav>
+    <section>
+      <div>
+        <h2>Désactiver un appareil</h2>
+        <h6>Pour désactiver l'appareil ne pas checker la checkbox </h6>
+        <div>
+          <input
+            type="number"
+            id="id_appareil"
+            placeholder="Id de l'appareil"
+          />
+          <input
+            type="text"
+            id="ip_appareil"
+            placeholder="IPv4 de l'appareil"
+          />
+          Activer <input type="checkbox" id="activation">
+          <button id="submit">Envoyer</button>
+        </div>
+      </div>
+    </section>
+
+    <script lang="text/javascript" src="../script/deactivate-device.js"></script>
+  </body>
+</html>
