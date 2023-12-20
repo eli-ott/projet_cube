@@ -4,7 +4,7 @@
 const checkConnect = async () => {
     if (!localStorage.getItem('token')) window.location = 'http://localhost:5500/front/pages/connect.html';
 
-    const res = await fetch('http://localhost:5500/getusername', {
+    const res = await fetch('http://localhost:5500/usernames', {
         method: 'GET'
     });
 

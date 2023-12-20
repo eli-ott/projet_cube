@@ -93,6 +93,7 @@ namespace Cube {
                     GetLastMeasure(app);
                     GetDevices(app);
                     GetMeasureTypes(app);
+                    GetUsers(app);
 
                     PostMeasure(app);
                     PostDevice(app);
@@ -116,6 +117,7 @@ namespace Cube {
                         }); //app.MapGet ..
                     } //void ..
 
+                    static void GetUsers(WebApplication app)        => app.MapGet("usernames",    () => ReadUsernames());
                     static void GetDevices(WebApplication app)      => app.MapGet("devices",      () => ReadDevices());
                     static void GetMeasureTypes(WebApplication app) => app.MapGet("measuretypes", () => ReadMeasureTypes());
 
@@ -319,6 +321,30 @@ namespace Cube {
                     } catch { return ApiResponse<List<Device>>.Error(ConsoleLogger.LogError("Impossible de lire la liste des appareils !")); }
             } // List<Device> ..
 
+            /// <summary>
+            /// Récupère tous les noms d'utilisateurs
+            /// </summary>
+            /// <returns> La liste des noms d'utilisateurs </returns>
+            static ApiResponse<List<string>> ReadUsernames() {
+                DBConnection instance = DBConnection.Instance();
+                if(!instance.IsConnect())
+                    instance.Connection?.Open();
+
+                string query = "SELECT username FROM `utilisateurs`";
+                try {
+                    using MySqlCommand command      = new (query, instance.Connection);
+                    MySqlDataReader reader          = command.ExecuteReader();
+                    List<string> usernames          = new();
+
+                    while(reader.Read()) 
+                        usernames.Add(reader.GetString("username"));
+                    
+                    reader.Close();
+                    ConsoleLogger.LogInfo("Lecture des noms d'utilisateurs");
+
+                    return ApiResponse<List<string>>.Success(usernames);
+                } catch { return ApiResponse<List<string>>.Error(ConsoleLogger.LogError("Impossible de lire la liste des types de mesure !")); }
+            }
 
             /// <summary>
             /// Récupère les types de mesure dans la base de données.
