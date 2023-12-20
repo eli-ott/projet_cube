@@ -22,7 +22,7 @@ const addMeasure = async () => {
         body: JSON.stringify(data)
     });
     const ret = await res.text();
-    if (ret.success === true) {
+    if (ret.reussite === true) {
         alert('Type de mesure ajouter avec succès');
     } else {
         alert('Impossible d\'ajouter le type de mesure');

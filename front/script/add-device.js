@@ -21,7 +21,7 @@ const addDevice = async () => {
         body: JSON.stringify(data)
     });
     const ret = await res.json();
-    if (ret.success === true) {
+    if (ret.reussite === true) {
         alert('Appareil ajouter avec succès');
     } else {
         alert('Impossible d\'ajouter l\'appareil');
