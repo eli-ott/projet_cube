@@ -20,8 +20,6 @@ namespace Cube {
             /** <summary> Chaine de caractères composée des instants séparées par une virgule </summary> **/         public string instants;
             /** <summary> Type de la mesure </summary> **/                                                           public string type;
         } // class ..
-            /** <summary> Unité de mesure </summary> **/                                                             public string unite_mesure;
-        }
 
         public class MeasureByDevice{
             /** <summary> chaine de caractère composé d'une valeur </summary> **/public string valeur;
@@ -96,7 +94,7 @@ namespace Cube {
                 //=========================
 
                     GetAllMeasures(app);
-
+                   
                     PostMeasure(app);
                     PostDevice(app);
                     PostMeasureType(app);
@@ -107,8 +105,8 @@ namespace Cube {
                     DeleteMeasureType(app);
 
 
-                    static void GetAllMeasures(WebApplication app)  => app.MapGet("/measures/{datedebut}/{datefin}",(string dateDebut, string dateFin) => FindAllMeasures(dateDebut, dateFin));
-                    
+                    static void GetAllMeasures(WebApplication app)  => app.MapGet("/measures/{datedebut}/{datefin}", (string dateDebut, string dateFin) => FindAllMeasures(dateDebut, dateFin));
+
                     static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => AddMeasure(measure));
                     static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => AddDevice(device));
                     static void PostMeasureType(WebApplication app) => app.MapPost("/newmeasuretype", (MeasureType measureType) => AddMeasureType(measureType));
