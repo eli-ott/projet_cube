@@ -91,9 +91,12 @@ namespace Cube {
                 //=========================
                 // R E Q U Ê T E S   A P I
                 //=========================
+
                     GetAllMeasures(app);
                     GetLastMeasure(app);
                     GetDevices(app);
+                    GetMeasureTypes(app);
+
                     PostMeasure(app);
                     PostDevice(app);
                     PostMeasureType(app);
@@ -116,7 +119,8 @@ namespace Cube {
                         }); //app.MapGet ..
                     } //void ..
 
-                    static void GetDevices(WebApplication app)      => app.MapGet("devices", () => ReadDevices());
+                    static void GetDevices(WebApplication app)      => app.MapGet("devices",      () => ReadDevices());
+                    static void GetMeasureTypes(WebApplication app) => app.MapGet("measuretypes", () => ReadMeasureTypes());
 
                     static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => AddMeasure(measure));
                     static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => AddDevice(device));
@@ -311,41 +315,40 @@ namespace Cube {
 
                         return ApiResponse<List<Device>>.Success(devices);
                     } catch { return ApiResponse<List<Device>>.Error(ConsoleLogger.LogError("Impossible de lire la liste des appareils !")); }
-            } // void ..
+            } // List<Device> ..
 
 
-            /// <summary>   
-            /// Retourne un type de mesure en fonction de son identifiant.
+            /// <summary>
+            /// Retourne tous les types de mesure.
             /// </summary>
-            /// <param name="id"> L'identifiant d'un type de mesure. </param>
-            static ApiResponse<MeasureType> ReadMeasureType(int id) {
+            static ApiResponse<List<MeasureType>> ReadMeasureTypes() {
 
                 DBConnection instance = DBConnection.Instance();
                 if (!instance.IsConnect())
                     instance.Connection?.Open();
 
-                    string query = "SELECT * FROM `type_mesure` WHERE `id_type` = @id_type LIMIT 1";
+                    string query = "SELECT * FROM `type_mesure`";
                     try {
 
-                        using MySqlCommand command = new (query, instance.Connection);
-                        command.Parameters.AddWithValue("@id_type",  id);
-                        MySqlDataReader reader = command.ExecuteReader();
-                        reader.Read();
-
-                        MeasureType measureType = new() {
-                            idType      = reader.GetInt32("id_type"),
-                            nomType     = reader.GetString("nom_type"),
-                            uniteMesure = reader.GetString("unite_mesure"),
-                            limiteMin   = reader.GetFloat("limite_min"),
-                            limiteMax   = reader.GetFloat("limite_max"),
-                        }; // ..
+                        using MySqlCommand command     = new (query, instance.Connection);
+                        MySqlDataReader reader         = command.ExecuteReader();
+                        List<MeasureType> measureTypes = new();
+                        
+                        while (reader.Read())
+                            measureTypes.Add(new() {
+                                idType      = reader.GetInt32("id_type"),
+                                nomType     = reader.GetString("nom_type"),
+                                uniteMesure = reader.GetString("unite_mesure"),
+                                limiteMin   = reader.GetFloat("limite_min"),
+                                limiteMax   = reader.GetFloat("limite_max"),
+                            }); // ..
 
                         reader.Close();
-                        ConsoleLogger.LogInfo("Lecture du type de mesure à l'identifiant " + id + ".");
+                        ConsoleLogger.LogInfo("Lecture de la liste des types de mesure avec succès.");
 
-                        return ApiResponse<MeasureType>.Success(measureType);
-                    } catch { return ApiResponse<MeasureType>.Error(ConsoleLogger.LogError("Impossible de lire le type de mesure à l'identifiant " + id + " !")); }
-            } // void ..
+                        return ApiResponse<List<MeasureType>>.Success(measureTypes);
+                    } catch { return ApiResponse<List<MeasureType>>.Error(ConsoleLogger.LogError("Impossible de lire la liste des types de mesure !")); }
+            } // List<MeasureType> ..
 
 
             /// <summary>
