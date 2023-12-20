@@ -15,13 +15,23 @@
     {"mesure":"8","instant":"18-12-2023"}
   ]
   ```
+- `/device-{id}` → Renvoi l'appareil associé à l'identifiant
+```json
+    {
+      "idAppareil":  "182.168.0.32-23", // IPV4 (32 bits) + ID (32 bits) → doit être identique à celui de l'appareil à modifier
+      "nomAppareil": "RaspberryPI 4",   // Nom permettant aux utilisateurs de distinguer les appareils
+      "idType":       2,                // Identifiant du type de mesure associé
+      "activation":   true              // Indique si l'API doit écouter cet appareil
+    }
+```
 ---
 ### POST
 Ces requêtes permettent d'ajouter des données au programme via l'API. Elles retournent une `ApiResponse` à leur fin sous le format suivant.
 ```json
 {
-  "success": <bool>,
-  "data":    <string?>
+  "reussite": <bool>,
+  "donnee":   <Any?>,
+  "message":  <string?>
 }
 ```
 
@@ -36,9 +46,10 @@ Ces requêtes permettent d'ajouter des données au programme via l'API. Elles re
 - `/newdevice` → Ajoute un nouvel appareil
     ```json
     {
-      "idAppareil":   396,               // IPV4 (32 bits) | ID (32 bits) 
-      "nomAppareil": "RaspberryPI Zero", // Nom permettant aux utilisateurs de distinguer les appareils
-      "idType":       2                  // Identifiant du type de mesure associé
+      "idAppareil":  "182.168.0.32-23", // IPV4 (32 bits) + ID (32 bits) → doit être identique à celui de l'appareil à modifier
+      "nomAppareil": "RaspberryPI 4",   // Nom permettant aux utilisateurs de distinguer les appareils
+      "idType":       2,                // Identifiant du type de mesure associé
+      "activation":   true              // Indique si l'API doit écouter cet appareil (`true` par défaut)
     }
   ```
 - `/newmeasuretype` → Ajoute un nouveau type de mesure
@@ -55,9 +66,10 @@ Ces requêtes permettent d'ajouter des données au programme via l'API. Elles re
 - `/device` → Mets à jour un appareil et l'ajoute s'il n'existe pas
     ```json
     {
-      "idAppareil":   396,            // IPV4 (32 bits) | ID (32 bits) → doit être identique à celui de l'appareil à modifier
-      "nomAppareil": "RaspberryPI 4", // Nom permettant aux utilisateurs de distinguer les appareils
-      "idType":       2               // Identifiant du type de mesure associé
+      "idAppareil":  "182.168.0.32-23", // IPV4 (32 bits) + ID (32 bits) → doit être identique à celui de l'appareil à modifier
+      "nomAppareil": "RaspberryPI 4",   // Nom permettant aux utilisateurs de distinguer les appareils (optionel)
+      "idType":       2,                // Identifiant du type de mesure associé                       (optionel)
+      "activation":   true              // Indique si l'API doit écouter cet appareil                  (`true` par défaut)
     }
   ```
 ---
@@ -70,29 +82,29 @@ Ces requêtes permettent d'ajouter des données au programme via l'API. Elles re
 CREATE DATABASE cubes;
 
 CREATE TABLE `type_mesure` (
-  `id_type`      INT(11) NOT NULL AUTO_INCREMENT,
-  `nom_type`     VARCHAR(50) NOT NULL,
-  `unite_mesure` VARCHAR(15) NOT NULL,
-  `limite_min`   FLOAT NOT NULL,
-  `limite_max`   FLOAT NOT NULL,
+  `id_type` int NOT NULL AUTO_INCREMENT,
+  `nom_type` varchar(50) NOT NULL,
+  `unite_mesure` varchar(15) NOT NULL,
+  `limite_min` float NOT NULL,
+	`limite_max` float NOT NULL,
   PRIMARY KEY (`id_type`),
-  UNIQUE  KEY `nom_type_unique` (`nom_type`)
+  UNIQUE KEY `nom_type_unique` (`nom_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
 
 CREATE TABLE `appareil` (
-  `id_appareil`  INT(64) PRIMARY KEY NOT NULL,
-  `nom_appareil` VARCHAR(50) NOT NULL,
-  `id_type`      INT(11) NOT NULL,
-  `activation`   BIT(1) NOT NULL DEFAULT b'1',
+  `id_appareil` bigint PRIMARY KEY NOT NULL,
+  `nom_appareil` varchar(50) NOT NULL,
+  `id_type` int NOT NULL,
+  `activation` bit(1) NOT NULL DEFAULT b'1',
   FOREIGN KEY (`id_type`) REFERENCES type_mesure(`id_type`),
-  UNIQUE  KEY `nom_appareil_unique` (`nom_appareil`)
+  UNIQUE KEY `nom_appareil_unique` (`nom_appareil`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
 
 CREATE TABLE `mesure` (
-  `id_mesure`   INT(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `valeur`      FLOAT NOT NULL,
-  `instant`     TIMESTAMP NOT NULL,
-  `id_appareil` INT(11) NOT NULL,
+  `id_mesure` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `valeur` float NOT NULL,
+  `instant` timestamp NOT NULL,
+  `id_appareil` bigint NOT NULL,
   FOREIGN KEY (`id_appareil`) REFERENCES appareil(`id_appareil`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
 ```
