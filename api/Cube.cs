@@ -144,8 +144,8 @@ namespace Cube {
         // R E Q U Ê T E S   M Y . S Q L
         //===============================
 
-            /** Objet cadenas pour prévenir les erreurs asynchrones lors des reqêtes. */ private static readonly object _Lock                             = new ();
-            /** Objet cadenas pour prévenir les erreurs asynchrones lors des reqêtes. */ public static          bool     IsQuerying { get; private set; } = false;
+            /** Objet cadenas pour prévenir les erreurs asynchrones lors des reqêtes. **/ private static readonly object _Lock                             = new ();
+            /** Indicateur de l'activité de l'API. **/                                    public static          bool     IsQuerying { get; private set; } = false;
 
 
             /// <summary>
