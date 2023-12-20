@@ -89,6 +89,8 @@ namespace Cube {
                 // R E Q U Ê T E S   A P I
                 //=========================
 
+                ConsoleLogger.LogInfo("192.168.0.32-1".ToDeviceBinaryID().ToString());
+
                     GetAllMeasures(app);
                     GetLastMeasure(app);
                     GetDevices(app);

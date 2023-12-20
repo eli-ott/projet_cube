@@ -2,7 +2,8 @@ namespace Cube.Data {
     public static class Utils {
 
         /// <summary>
-        /// Transforme la concatenation d'un IPV4 et d'un identifiant 32 bit en un identifiant 64 bit.
+        ///       Transforme la concatenation d'un IPV4 et d'un identifiant 32 bit en un identifiant 64 bit.
+        /// <br/> Exemple: "192.168.0.32-1" devient 4831881408
         /// </summary>
         /// <param name="self"> La concatenation d'un IPV4 et d'un identifiant 32 bit. </param>
         /// <returns> Un identifiant 64 bit si le format correspond, autrement retourne `null`. </returns>
@@ -20,7 +21,14 @@ namespace Cube.Data {
         } // int ..
 
 
+        /// <summary>
+        ///       Transforme un identifiant 64 bit sous sa forme concaténée d'un IPV4 et d'un identifiant 32 bit.
+        /// <br/> Exemple: 4831881408 devient "192.168.0.32-1"
+        /// </summary>
+        /// <param name="self"> L'identifiant 64 bit </param>
+        /// <returns> Forme IPV4-ID. </returns>
         public static string ToDeviceStringID(this long self) =>
             $"{self & 0xFF}.{(self >> 8) & 0xFF}.{(self >> 16) & 0xFF}.{(self >> 24) & 0xFF}-{self >> 32}";
+
     } // class ..
 } // namespace ..
