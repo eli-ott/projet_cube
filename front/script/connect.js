@@ -32,7 +32,7 @@ const connect = async () => {
         password
     }
 
-    const res = await fetch('http://localhost:5500/connect', {
+    const res = await fetch('http://localhost:5023/checkconnection', {
         method: 'POST',
         headers: {
             "Content-type": 'application/json',
@@ -42,6 +42,7 @@ const connect = async () => {
     const ret = await res.json();
     console.log(ret);
     if (ret.reussite === true) {
+        localStorage.setItem('token', username);
         window.location = 'http://localhost:5500/front/pages/data.html';
     } else {
         alert('Erreur lors de la connection');

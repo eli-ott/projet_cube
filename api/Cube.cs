@@ -105,6 +105,7 @@ namespace Cube {
                     PostDevice(app);
                     PostMeasureType(app);
                     PostUtilisateur(app);
+                    PostConnection(app);
 
                     PutDevice(app);
 
@@ -128,6 +129,7 @@ namespace Cube {
                     static void GetDevices(WebApplication app)      => app.MapGet("devices",      () => ReadDevices());
                     static void GetMeasureTypes(WebApplication app) => app.MapGet("measuretypes", () => ReadMeasureTypes());
 
+                    static void PostConnection(WebApplication app)  => app.MapPost("/checkconnection", (Utilisateur utilisateur) => CheckConnection(utilisateur));
                     static void PostUtilisateur(WebApplication app) => app.MapPost("/newuser",        (Utilisateur utilisateur) => AddUser(utilisateur));
                     static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => AddMeasure(measure));
                     static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => AddDevice(device));
@@ -270,6 +272,29 @@ namespace Cube {
             } // void ..
 
             /// <summary>
+            /// Permet de vérifier la connection d'un utilisateur
+            /// </summary>
+            /// <param name="user">Les donées de l'utilisateur</param>
+            /// <returns>Le retour classique de l'API</returns>
+            static ApiResponse<Any> CheckConnection(Utilisateur user) {
+                DBConnection instance = DBConnection.Instance();
+                if(!instance.IsConnect()) 
+                    instance.Connection?.Open();
+
+                string query = "SELECT COUNT(*) FROM `utilisateurs` WHERE username = @username AND password = @password";
+                using (MySqlCommand command = new MySqlCommand(query, instance.Connection)) {
+                    command.Parameters.AddWithValue("@username", user.username);
+                    command.Parameters.AddWithValue("@password", user.password);
+
+                    if (Convert.ToInt32(command.ExecuteScalar()) == 0) {
+                        return ApiResponse<Any>.Error(ConsoleLogger.LogError("Aucun utilisateur ne correspond à ce nom ou à ce mot de passe !"));
+                    } else {
+                        return ApiResponse<Any>.Success();
+                    }
+                } // using ..
+            }
+
+            /// <summary>
             /// Peremt d'ajouter un nouvel utilisateur
             /// </summary>
             /// <param name="user">Les données de l'utilisateur</param>
@@ -286,7 +311,7 @@ namespace Cube {
                     command.Parameters.AddWithValue("@password", user.password);
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Ajout de " + user.username + " à la liste des utilisateurs");
-                    
+
                 } catch { return ApiResponse<Any>.Error(ConsoleLogger.LogError("Impossible d'ajouter " + user.username + " à la liste des utilisateurs !")); }
                 return ApiResponse<Any>.Success();
             }
