@@ -15,15 +15,9 @@ namespace Cube {
             /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/     public required string idAppareil { get; set; }
         } // class ..
 
-        public class MeasuresValues{
-            /** <summary> Chaine de caractères composée des valeurs mesurées séparées par une virgule </summary> **/ public string valeurs;
-            /** <summary> Chaine de caractères composée des instants séparées par une virgule </summary> **/         public string instants;
-            /** <summary> Type de la mesure </summary> **/                                                           public string type;
-        } // class ..
-
         public class MeasureByDevice{
-            /** <summary> chaine de caractère composé d'une valeur </summary> **/public string valeur;
-            /** <summary> chaine de caractère composé d'un instant </summary> **/public string instant;
+            /** <summary> chaine de caractère composé d'une valeur </summary> **/public string valeur { get; set; }
+            /** <summary> chaine de caractère composé d'un instant </summary> **/public string instant { get; set; }
         }
 
         public class Device {
