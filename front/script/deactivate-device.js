@@ -1,5 +1,5 @@
 /**
- * Adding a new device using the API when the user clicks on 'Envoyer'
+ * Deactivating or activating a device using the API when the user clicks on 'Envoyer'
  */
 const deactivateDevice = async () => {
     let id_appareil = document.getElementById('id_appareil').value;
