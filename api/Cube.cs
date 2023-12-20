@@ -16,9 +16,9 @@ namespace Cube {
         } // class ..
 
         public class MeasureByDevice{
-            /** <summary> chaine de caractère composé d'une valeur </summary> **/public string valeur { get; set; }
-            /** <summary> chaine de caractère composé d'un instant </summary> **/public string instant { get; set; }
-        }
+            /** <summary> Chaîne de caractère composée de valeurs séparées par une virgule </summary> **/ public string valeur  { get; set; }
+            /** <summary> Chaîne de caractère composée de dates séparées par une virgule </summary> **/   public string instant { get; set; }
+        } // class ..
 
         public class Device {
             /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/                  public required string  idAppareil  { get; set; }
@@ -99,20 +99,22 @@ namespace Cube {
                     DeleteMeasureType(app);
 
 
-                    static void GetAllMeasures(WebApplication app)  => app.MapGet("/measures/{datedebut}/{datefin}", (string dateDebut, string dateFin) => FindAllMeasures(dateDebut, dateFin));
+                    static void GetAllMeasures(WebApplication app)  => app.MapGet("/measures/{datedebut}/{datefin}", (string dateDebut, string dateFin) => EnsureThreadSafety(args => FindAllMeasures(dateDebut, dateFin)));
+                    static void GetDevices(WebApplication app)      => app.MapGet("devices",      () => EnsureThreadSafety(args => ReadDevices()));
+                    static void GetMeasureTypes(WebApplication app) => app.MapGet("measuretypes", () => EnsureThreadSafety(args => ReadMeasureTypes()));
 
-                    static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => AddMeasure(measure));
-                    static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => AddDevice(device));
-                    static void PostMeasureType(WebApplication app) => app.MapPost("/newmeasuretype", (MeasureType measureType) => AddMeasureType(measureType));
+                    static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => EnsureThreadSafety(args => AddMeasure(measure)));
+                    static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => EnsureThreadSafety(args => AddDevice(device)));
+                    static void PostMeasureType(WebApplication app) => app.MapPost("/newmeasuretype", (MeasureType measureType) => EnsureThreadSafety(args => AddMeasureType(measureType)));
 
                     static void PutDevice(WebApplication app) => app.MapPut("/device", (Device device) => UpdateDevice(device));
 
-                    static void DeleteDevice(WebApplication app)      => app.MapDelete("/device-{id}",      (string id) => DeleteDeviceWithMeasures(id));
-                    static void DeleteMeasureType(WebApplication app) => app.MapDelete("/measuretype-{id}", (int id)    => DeleteMeasureTypeWithDevices(id));
+                    static void DeleteDevice(WebApplication app)      => app.MapDelete("/device-{id}",      (string id) => EnsureThreadSafety(args => DeleteDeviceWithMeasures(id)));
+                    static void DeleteMeasureType(WebApplication app) => app.MapDelete("/measuretype-{id}", (int id)    => EnsureThreadSafety(args => DeleteMeasureTypeWithDevices(id)));
 
 
                 // Envoie des données aléatoires toutes les 5 secondes.
-                //_ = new Timer(async _ => await Simulation.Run(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+                _ = new Timer(async _ => await Simulation.Run(true), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
 
 
                 app.UseCors(SpecialOrigin);
@@ -126,7 +128,35 @@ namespace Cube {
         // R E Q U Ê T E S   M Y . S Q L
         //===============================
 
+            /** Objet cadenas pour prévenir les erreurs asynchrones lors des reqêtes. **/ private static readonly object _Lock                             = new ();
+            /** Indicateur de l'activité de l'API. **/                                    public static          bool     IsQuerying { get; private set; } = false;
 
+
+            /// <summary>
+            /// Applique la requête si aucune requête n'est actuellement gérée par l'API.
+            /// </summary>
+            /// <typeparam name="T">   Le type de données transférées lors de la requête. </typeparam>
+            /// <param name="request"> La requête. </param>
+            /// <param name="args">    Les éventuels arguments de la requête. </param>
+            /// <returns>              Le résultat de la requête. </returns>
+            public static ApiResponse<T> EnsureThreadSafety<T>(
+                Func<object[], ApiResponse<T>> request,
+                params object[] args
+            ) {
+                lock (Program._Lock) {
+                    if (Program.IsQuerying)
+                        return ApiResponse<T>.Error(ConsoleLogger.LogError("L'API est déjà en train de gérer une requête !"));
+
+                    Program.IsQuerying = true;
+
+                    try {
+
+                        ApiResponse<T> output = request(args);
+                        return output;
+
+                    } finally { Program.IsQuerying = false; }
+                } // lock ..
+            } // ApiResponse ..
 
 
             /// <summary> 

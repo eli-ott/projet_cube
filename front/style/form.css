@@ -32,7 +32,8 @@ input {
     border: solid 1px black;
 }
 
-button#submit {
+#submit,
+#connect {
     cursor: pointer;
 
     min-width: 150px;
@@ -45,7 +46,8 @@ button#submit {
     border: solid 1px black;
 }
 
-button#submit:hover {
+#submit:hover,
+#connect:hover {
     background: none;
 }
 

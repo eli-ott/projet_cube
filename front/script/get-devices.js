@@ -9,6 +9,8 @@ const getDevices = async () => {
 
     if (ret_devices.reussite === true) {
         showDevices(ret_devices.donnee);
+    } else {
+        alert('Problème lors de la récupération des appareils');
     }
 
     const res_measures = await fetch('http://localhost:5023/measuretypes', {
@@ -18,12 +20,14 @@ const getDevices = async () => {
 
     if (ret_measures.reussite === true) {
         showMeasures(ret_measures.donnee);
+    } else {
+        alert('Problème lors de la récupération des types de mesures');
     }
 }
 getDevices();
 setInterval(() => {
     getDevices();
-}, 15000);
+}, 5000);
 
 /**
  * Show all the devices
@@ -50,7 +54,7 @@ const showDevices = (data) => {
 
 /**
  * Show all the measures types to the user
-*/
+ */
 const showMeasures = (data) => {
     data.forEach(measure => {
         const card = `
@@ -67,7 +71,7 @@ const showMeasures = (data) => {
         <br />
         </div>
         `;
-        
+
         document.querySelector('.mesures-container').innerHTML += card;
         document.getElementsByClassName('mesures-default')[0].style.display = 'none';
     });
