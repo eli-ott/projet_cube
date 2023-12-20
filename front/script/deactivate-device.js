@@ -8,7 +8,7 @@ const deactivateDevice = async () => {
 
     const data = {
         "idAppareil": ip_appareil + '-' + id_appareil,
-        activation
+        'activation': activation
     }
 
     const res = await fetch('http://localhost:5023/device', {
