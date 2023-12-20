@@ -195,6 +195,7 @@ namespace Cube {
                 while (reader.Read()){
                     values.Add(reader.GetString("unite_mesure"), new(){valeurs = reader.GetString("mesures"), instants = reader.GetString("instants"), type = reader.GetString("nom_type")});
                 }
+                reader.Close();
                 return values;
             } catch (MySqlException _) { ConsoleLogger.LogError("Impossible d'afficher les mesures de l'appareil " + idAppareil + " !"); }
             return values;
