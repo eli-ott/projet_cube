@@ -24,7 +24,7 @@ namespace Cube.Data {
             /// <summary>
             /// Permet d'accéder à l'instance de connexion et de la créer si nécessaire.
             /// </summary>
-            /// <returns></returns>
+            /// <returns> L'instance de connexion. </returns>
             public static DBConnection Instance()  {
                 DBConnection. _instance ??= new DBConnection();
                 return DBConnection._instance;
@@ -34,7 +34,7 @@ namespace Cube.Data {
             /// <summary>
             /// Indique si la connexion est établie.
             /// </summary>
-            /// <returns></returns>
+            /// <returns> `true` quand la connexion est établie. </returns>
             public bool IsConnect() {
                 if (this.Connection == null) {
 

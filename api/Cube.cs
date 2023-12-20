@@ -15,14 +15,11 @@ namespace Cube {
             /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/     public required string idAppareil { get; set; }
         } // class ..
 
-        /// <summary>
-        ///
-        /// </summary>
         public class MeasuresValues{
             /** <summary> Chaine de caractères composée des valeurs mesurées séparées par une virgule </summary> **/ public string valeurs;
             /** <summary> Chaine de caractères composée des instants séparées par une virgule </summary> **/         public string instants;
             /** <summary> Type de la mesure </summary> **/                                                           public string type;
-        }
+        } // class ..
 
 
         public class Device {
@@ -133,7 +130,7 @@ namespace Cube {
 
 
                 // Envoie des données aléatoires toutes les 5 secondes.
-                _ = new Timer(async _ => await Simulation.Run(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+                _ = new Timer(async _ => await Simulation.Run(true), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
 
 
                 app.UseCors(SpecialOrigin);
@@ -179,6 +176,7 @@ namespace Cube {
             /// Ajoute une mesure dans la base de donnée si l'appareil associé est déjà enregistré.
             /// </summary>
             /// <param name="measure"> Une mesure générique. </param>
+            /// <returns> Une réponse API générique. </returns>
             static ApiResponse<Any> AddMeasure(Measure measure) {
 
                 DBConnection instance = DBConnection.Instance();
@@ -238,6 +236,7 @@ namespace Cube {
             /// Ajoute un appareil dans la base de donnée si le type de mesure associé est déjà enregistré.
             /// </summary>
             /// <param name="device"> Un appareil de mesure. </param>
+            /// <returns> Une réponse API générique. </returns>
             static ApiResponse<Any> AddDevice(Device device) {
 
                 DBConnection instance = DBConnection.Instance();
@@ -264,6 +263,7 @@ namespace Cube {
             /// Ajoute un type de mesure dans la base de donnée.
             /// </summary>
             /// <param name="measureType"> Un type de mesure. </param>
+            /// <returns> Une réponse API générique. </returns>
             static ApiResponse<Any> AddMeasureType(MeasureType measureType) {
 
                 DBConnection instance = DBConnection.Instance();
@@ -287,8 +287,9 @@ namespace Cube {
 
 
             /// <summary>
-            /// Retourne tous les appareils de mesure.
+            /// Récupère les appareils dans la base de données.
             /// </summary>
+            /// <returns> La liste des tous les appareils de mesure. </returns>
             static ApiResponse<List<Device>> ReadDevices() {
 
                 DBConnection instance = DBConnection.Instance();
@@ -319,8 +320,9 @@ namespace Cube {
 
 
             /// <summary>
-            /// Retourne tous les types de mesure.
+            /// Récupère les types de mesure dans la base de données.
             /// </summary>
+            /// <returns> La liste des tous les types de mesure. </returns>
             static ApiResponse<List<MeasureType>> ReadMeasureTypes() {
 
                 DBConnection instance = DBConnection.Instance();
@@ -355,6 +357,7 @@ namespace Cube {
             /// Mets à jour un appareil dans la base de donnée et l'ajoute s'il n'existe pas.
             /// </summary>
             /// <param name="device"> L'appareil mis à jour. </param>
+            /// <returns> Une réponse API générique. </returns>
             static ApiResponse<Any> UpdateDevice(Device device) {
 
                 DBConnection instance = DBConnection.Instance();
@@ -380,6 +383,7 @@ namespace Cube {
                     } // using ..
 
 
+                    // On adapte la requête au valeur indiquées dans le PUT afin de ne changer que ce qui nous intéresse.
                     string query = "UPDATE `appareil` SET"
                     + (device.nomAppareil is not null ? " `nom_appareil` = @nom_appareil, " : "")
                     + (device.idType      is int    ?   " `id_type` = @id_type, "           : "")
@@ -405,6 +409,7 @@ namespace Cube {
             /// Supprime un appareil dans la base de donnée et toutes les mesures associées.
             /// </summary>
             /// <param name="id"> L'identifiant d'un appareil de mesure. </param>
+            /// <returns> Une réponse API générique. </returns>
             static ApiResponse<Any> DeleteDeviceWithMeasures(string id) {
 
                 DBConnection instance = DBConnection.Instance();
@@ -435,13 +440,16 @@ namespace Cube {
             /// Supprime un type de mesure dans la base de donnée et touts les appareils et mesures associés.
             /// </summary>
             /// <param name="id"> L'identifiant d'un type de mesure. </param>
-            static ApiResponse<string> DeleteMeasureTypeWithDevices(int id) {
+            /// <returns> Une réponse API générique. </returns>
+            static ApiResponse<Any> DeleteMeasureTypeWithDevices(int id) {
 
                 DBConnection instance = DBConnection.Instance();
                 if (!instance.IsConnect())
                     instance.Connection?.Open();
 
 
+                // Afin d'éviter la présence de clés étrangères pointant vers une référence nulle,
+                // on supprime d'abord toutes les mesures associées à un type de mesure...
                 string queryMeasure = "DELETE mesure FROM mesure JOIN appareil ON mesure.id_appareil = appareil.id_appareil WHERE appareil.id_type = @id_type";
                 try {
 
@@ -450,9 +458,10 @@ namespace Cube {
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Suppression des mesures liées aux appareils de type " + id + ".");
 
-                } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible de supprimer les mesures liées aux appareils de type " + id + " !")); }
+                } catch { return ApiResponse<Any>.Error(ConsoleLogger.LogError("Impossible de supprimer les mesures liées aux appareils de type " + id + " !")); }
 
 
+                // ... puis les appareils ...
                 string queryDevice = "DELETE FROM `appareil` WHERE `id_type` = @id_type";
                 try {
 
@@ -461,9 +470,10 @@ namespace Cube {
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Suppression de l'appareil au type de mesure " + id + ".");
 
-                } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible de supprimer l'appareil au type de mesure " + id + " !")); }
+                } catch { return ApiResponse<Any>.Error(ConsoleLogger.LogError("Impossible de supprimer l'appareil au type de mesure " + id + " !")); }
 
 
+                // ... et enfin les types de mesure elles-même.
                 string queryMeasureType = "DELETE FROM `type_mesure` WHERE `id_type` = @id_type";
                 try {
 
@@ -472,8 +482,8 @@ namespace Cube {
                     command.ExecuteNonQuery();
                     ConsoleLogger.LogInfo("Suppression du type de mesure à l'identifiant " + id + ".");
 
-                } catch { return ApiResponse<string>.Error(ConsoleLogger.LogError("Impossible de supprimer le type de mesure à l'identifiant " + id + " !")); }
-                return ApiResponse<string>.Success();
+                } catch { return ApiResponse<Any>.Error(ConsoleLogger.LogError("Impossible de supprimer le type de mesure à l'identifiant " + id + " !")); }
+                return ApiResponse<Any>.Success();
             } // void ..
     } // class ..
 } // namespace ..
