@@ -21,8 +21,13 @@ namespace Cube {
             /** <summary> Chaine de caractères composée des valeurs mesurées séparées par une virgule </summary> **/ public string valeurs;
             /** <summary> Chaine de caractères composée des instants séparées par une virgule </summary> **/         public string instants;
             /** <summary> Type de la mesure </summary> **/                                                           public string type;
+            /** <summary> Unité de mesure </summary> **/                                                             public string unite_mesure;
         }
 
+        public class MeasureByDevice{
+            /** <summary> chaine de caractère composé d'une valeur </summary> **/public string valeur;
+            /** <summary> chaine de caractère composé d'un instant </summary> **/public string instant;
+        }
 
         public class Device {
             /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/                  public int    idAppareil  { get; set; }
@@ -87,7 +92,7 @@ namespace Cube {
                 //=========================
 
                     GetAllMeasures(app);
-                    GetLastMeasure(app);
+
                     PostMeasure(app);
                     PostDevice(app);
                     PostMeasureType(app);
@@ -98,19 +103,8 @@ namespace Cube {
                     DeleteMeasureType(app);
 
 
-                    static void GetAllMeasures(WebApplication app){
-                     app.MapGet("/measures-{idAppareil}", (int idAppareil) => {
-                        FindAllMeasures(idAppareil);
-                     }); //app.MapGet ..
-                    } //void ..
-
-                    static void GetLastMeasure(WebApplication app){
-                        app.MapGet("/lastmeasure-{idAppareil}", (int idAppareil) => {
-
-                        }); //app.MapGet ..
-                    } //void ..
-
-
+                    static void GetAllMeasures(WebApplication app)  => app.MapGet("/measures/{datedebut}/{datefin}",(string dateDebut, string dateFin) => FindAllMeasures(dateDebut, dateFin));
+                    
                     static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => AddMeasure(measure));
                     static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => AddDevice(device));
                     static void PostMeasureType(WebApplication app) => app.MapPost("/newmeasuretype", (MeasureType measureType) => AddMeasureType(measureType));
@@ -122,7 +116,7 @@ namespace Cube {
 
 
                 // Envoie des données aléatoires toutes les 5 secondes.
-                _ = new Timer(async _ => await Simulation.Run(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+                //_ = new Timer(async _ => await Simulation.Run(), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
 
 
                 app.UseCors(SpecialOrigin);
@@ -139,30 +133,45 @@ namespace Cube {
 
 
 
-        /// <summary> Récupère toutes les mesures d'un appareil dans la base de donnée </summary>
-        /// <param name="idAppareil"> L'identifiant de l'appareil recherché </param>
-        static Dictionary<string, MeasuresValues> FindAllMeasures(int idAppareil){
+            /// <summary> 
+            /// Récupère toutes les mesures d'un appareil dans la base de donnée 
+            /// </summary>
+            static Dictionary<string, Dictionary<string, MeasureByDevice>> FindAllMeasures(string dateDebut, string dateFin){
 
-            DBConnection instance = DBConnection.Instance();
-            if (!instance.IsConnect())
-                instance.Connection?.Open();
+                DBConnection instance = DBConnection.Instance();
+                if (!instance.IsConnect())
+                    instance.Connection?.Open();
 
-            /// Pour convertir une valeur normée en valeur originale = valeur normée * (borne max - borne min) + borne min
-            string query = "SELECT GROUP_CONCAT((valeur*(type_mesure.limite_max-type_mesure.limite_min)+type_mesure.limite_min)) as mesures, GROUP_CONCAT(instant) as instants, nom_type, unite_mesure FROM mesure JOIN appareil ON mesure.id_appareil = appareil.id_appareil JOIN type_mesure ON appareil.id_type = type_mesure.id_type GROUP BY appareil.id_appareil";
-           
-            Dictionary<string, MeasuresValues> values = new Dictionary<string, MeasuresValues>();
+                /// Pour convertir une valeur normée en valeur originale = valeur normée * (borne max - borne min) + borne min
+                string query = "SELECT GROUP_CONCAT((valeur*(type_mesure.limite_max-type_mesure.limite_min)+type_mesure.limite_min)) as mesures, GROUP_CONCAT(instant) as instants, appareil.id_appareil, appareil.id_type, nom_type, unite_mesure FROM mesure JOIN appareil ON mesure.instant >= @dateDebut AND mesure.instant <= @dateFin AND mesure.id_appareil = appareil.id_appareil JOIN type_mesure ON appareil.id_type = type_mesure.id_type GROUP BY appareil.id_appareil";
 
+                /// Dictionnaire qui à pour clé l'id_type et pour valeur le dictionnaire measuresByDevice 
+                Dictionary<string, Dictionary<string, MeasureByDevice>> measuresByType = new Dictionary<string, Dictionary<string, MeasureByDevice>>();
 
-            try {
-                using var command = new MySqlCommand(query, instance.Connection);
-                using var reader = command.ExecuteReader();
-                while (reader.Read()){
-                    values.Add(reader.GetString("unite_mesure"), new(){valeurs = reader.GetString("mesures"), instants = reader.GetString("instants"), type = reader.GetString("nom_type")});
-                }
-                return values;
-            } catch (MySqlException _) { ConsoleLogger.LogError("Impossible d'afficher les mesures de l'appareil " + idAppareil + " !"); }
-            return values;
-        }
+                try {
+                    using var command = new MySqlCommand(query, instance.Connection);
+                    command.Parameters.AddWithValue("@dateDebut", dateDebut.Replace('_', ' '));
+                    command.Parameters.AddWithValue("@dateFin", dateFin.Replace('_', ' '));
+                    using var reader = command.ExecuteReader();
+                    while (reader.Read()){
+                        /// Si l'id_type est présent dans le dictionnaire measuresByType
+                        if (measuresByType.TryGetValue(reader.GetString("id_type"), out Dictionary<string, MeasureByDevice>? measuresByDevice)){
+                            /// Ajoute au dictionnaire measuresByDevice en clé l'id_appareil et en valeur la class MeasureByDevice qui contient les mesures et les instants
+                            measuresByDevice.Add(reader.GetString("id_appareil"), new(){valeur = reader.GetString("mesures"), instant = reader.GetString("instants")});
+                        /// Si l'id_type n'est pas présent dans le dictionnaire measuresByType
+                        } else {
+                            /// Ajoute au dictionnaire measuresByDevice en clé l'id_appareil et en valeur la class MeasureByDevice qui contient les mesures et les instants
+                            measuresByDevice = new Dictionary<string, MeasureByDevice> {
+                                { reader.GetString("id_appareil"), new() { valeur = reader.GetString("mesures"), instant = reader.GetString("instants") } }
+                            };
+                            /// Puis ajoute au dictionnaire measureByType en clé l'id_type et en valeur le dictionnaire measuresByDevice
+                            measuresByType.Add(reader.GetString("id_type"), measuresByDevice);                    
+                        }
+                    } reader.Close();
+                    return measuresByType;
+                } catch (MySqlException _) { ConsoleLogger.LogError("Impossible d'afficher les mesures !"); }
+                return measuresByType;
+            }
 
             /// <summary>
             /// Ajoute une mesure dans la base de donnée si l'appareil associé est déjà enregistré.
