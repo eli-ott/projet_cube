@@ -2,13 +2,22 @@
  * Get all the devices
  */
 const getDevices = async () => {
-    const res = await fetch('http://localhost:5023/devices', {
+    const res_devices = await fetch('http://localhost:5023/devices', {
         method: 'GET'
     });
-    const ret = await res.json();
-    
-    if (ret.reussite === true) {
-        showDevices(ret.donnee);
+    const ret_devices = await res_devices.json();
+
+    if (ret_devices.reussite === true) {
+        showDevices(ret_devices.donnee);
+    }
+
+    const res_measures = await fetch('http://localhost:5023/measuretypes', {
+        method: 'GET'
+    });
+    const ret_measures = await res_measures.json();
+
+    if (ret_measures.reussite === true) {
+        showMeasures(ret_measures.donnee);
     }
 }
 getDevices();
@@ -35,5 +44,29 @@ const showDevices = (data) => {
         `;
 
         document.getElementsByClassName('appareils-container')[0].innerHTML += card;
+    });
+}
+
+/**
+ * Show all the measures types to the user
+ */
+const showMeasures = (data) => {
+    data.forEach(measure => {
+        const card = `
+        <div class="carte mesure">
+            <div><u>ID de la mesure</u> : ${measure.idType}</div>
+            <br />
+            <div><u>Nom du type de la mesure</u> : ${measure.nomType}</div>
+            <br />
+            <div><u>Unité de la mesure</u> : ${measure.uniteMesure}</div>
+            <br />
+            <div><u>Limite minimale de la mesure</u> : ${measure.limiteMin}</div>
+            <br />
+            <div><u>Limite maximale de la mesure</u> : ${measure.limiteMax}</div>
+            <br />
+        </div>
+      `;
+
+        document.querySelector('.mesures-container').innerHTML += card;
     });
 }
