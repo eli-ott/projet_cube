@@ -33,10 +33,11 @@ namespace Cube {
         } // class ..
 
         public class MeasureType {
-            /** <summary> Nom permettant aux utilisateurs de distinguer les types de mesure </summary> **/  public string nomType     { get; set; } = "Nouveau type de mesure";
-            /** <summary> Unité de mesure </summary> **/                                                    public string uniteMesure { get; set; } = "";
-            /** <summary> Plus petite valeur acceptée </summary> **/                                        public float  limiteMin   { get; set; } = 0f;
-            /** <summary> Plus grande valeur acceptée </summary> **/                                        public float  limiteMax   { get; set; } = 1f;
+            /** <summary> Identifiant auto </summary> **/                                                   public int?    idType      { get; set; }
+            /** <summary> Nom permettant aux utilisateurs de distinguer les types de mesure </summary> **/  public string? nomType     { get; set; } = "Nouveau type de mesure";
+            /** <summary> Unité de mesure </summary> **/                                                    public string? uniteMesure { get; set; }
+            /** <summary> Plus petite valeur acceptée </summary> **/                                        public float   limiteMin   { get; set; } = 0f;
+            /** <summary> Plus grande valeur acceptée </summary> **/                                        public float   limiteMax   { get; set; } = 1f;
         } // class ..
         
 
@@ -92,7 +93,7 @@ namespace Cube {
                 //=========================
                     GetAllMeasures(app);
                     GetLastMeasure(app);
-                    GetDevice(app);
+                    GetDevices(app);
                     PostMeasure(app);
                     PostDevice(app);
                     PostMeasureType(app);
@@ -115,7 +116,7 @@ namespace Cube {
                         }); //app.MapGet ..
                     } //void ..
 
-                    static void GetDevice(WebApplication app) => app.MapGet("device-{id}", (string id) => ReadDevice(id));
+                    static void GetDevices(WebApplication app)      => app.MapGet("devices", () => ReadDevices());
 
                     static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => AddMeasure(measure));
                     static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => AddDevice(device));
@@ -282,38 +283,68 @@ namespace Cube {
 
 
             /// <summary>
-            /// Retourne un appareil en fonction de son identifiant
+            /// Retourne tous les appareils de mesure.
             /// </summary>
-            /// <param name="id"> L'identifiant d'un appareil de mesure. </param>
-            static ApiResponse<Device> ReadDevice(string id) {
+            static ApiResponse<List<Device>> ReadDevices() {
 
                 DBConnection instance = DBConnection.Instance();
                 if (!instance.IsConnect())
                     instance.Connection?.Open();
 
-                // On vérifie que l'identifiant de l'appareil associé est valide.
-                if (id.ToDeviceBinaryID() is long binaryID) {
-                    string query = "SELECT * FROM `appareil` WHERE `id_appareil` = @id_appareil LIMIT 1";
-                    // try {
+                    string query = "SELECT * FROM `appareil`";
+                    try {
 
                         using MySqlCommand command = new (query, instance.Connection);
-                        command.Parameters.AddWithValue("@id_appareil",  binaryID);
+                        MySqlDataReader reader     = command.ExecuteReader();
+                        List<Device> devices       = new();
+                        
+                        while (reader.Read())
+                            devices.Add(new() {
+                                idAppareil  = reader.GetInt64("id_appareil").ToDeviceStringID(),
+                                nomAppareil = reader.GetString("nom_appareil"),
+                                activation  = reader.GetBoolean("activation"),
+                                idType      = reader.GetInt32("id_type"),
+                            }); // ..
+
+                        reader.Close();
+                        ConsoleLogger.LogInfo("Lecture de la liste des appareils avec succès.");
+
+                        return ApiResponse<List<Device>>.Success(devices);
+                    } catch { return ApiResponse<List<Device>>.Error(ConsoleLogger.LogError("Impossible de lire la liste des appareils !")); }
+            } // void ..
+
+
+            /// <summary>   
+            /// Retourne un type de mesure en fonction de son identifiant.
+            /// </summary>
+            /// <param name="id"> L'identifiant d'un type de mesure. </param>
+            static ApiResponse<MeasureType> ReadMeasureType(int id) {
+
+                DBConnection instance = DBConnection.Instance();
+                if (!instance.IsConnect())
+                    instance.Connection?.Open();
+
+                    string query = "SELECT * FROM `type_mesure` WHERE `id_type` = @id_type LIMIT 1";
+                    try {
+
+                        using MySqlCommand command = new (query, instance.Connection);
+                        command.Parameters.AddWithValue("@id_type",  id);
                         MySqlDataReader reader = command.ExecuteReader();
                         reader.Read();
 
-                        Device device = new() {
-                            idAppareil  = reader.GetInt64("id_appareil").ToDeviceStringID(),
-                            nomAppareil = reader.GetString("nom_appareil"),
-                            activation  = reader.GetBoolean("activation"),
+                        MeasureType measureType = new() {
                             idType      = reader.GetInt32("id_type"),
+                            nomType     = reader.GetString("nom_type"),
+                            uniteMesure = reader.GetString("unite_mesure"),
+                            limiteMin   = reader.GetFloat("limite_min"),
+                            limiteMax   = reader.GetFloat("limite_max"),
                         }; // ..
 
                         reader.Close();
-                        ConsoleLogger.LogInfo("Lecture de l'appareil à l'identifiant " + id + ".");
+                        ConsoleLogger.LogInfo("Lecture du type de mesure à l'identifiant " + id + ".");
 
-                        return ApiResponse<Device>.Success(device);
-                    // } catch { return ApiResponse<Device>.Error(ConsoleLogger.LogError("Impossible de lire l'appareil à l'identifiant " + id + " !")); }
-                } else return ApiResponse<Device>.Error(ConsoleLogger.LogError(id + " n'est pas un identifiant sous le format IPV4-ID !"));
+                        return ApiResponse<MeasureType>.Success(measureType);
+                    } catch { return ApiResponse<MeasureType>.Error(ConsoleLogger.LogError("Impossible de lire le type de mesure à l'identifiant " + id + " !")); }
             } // void ..
 
 
