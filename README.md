@@ -42,6 +42,14 @@ CREATE TABLE `mesure` (
   FOREIGN KEY (`id_appareil`) REFERENCES appareil(`id_appareil`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
 ```
+```sql
+CREATE TABLE `utilisateurs` (
+  `id_user`  int         NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(50) NOT NULL,
+  PRIMARY KEY (id_user)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+```
 
 La seconde étape consiste en l'installation de [.NET SDK 7.0](https://dotnet.microsoft.com/en-us/download/dotnet/7.0). Il faut ensuite s'assurer d'héberger le répertoire afin de pouvoir utiliser l'interface web. Une fois terminée, il ne reste plus qu'à entrer la commande dans le répertoire : `dotnet run`.
 
