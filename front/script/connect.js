@@ -8,13 +8,13 @@ if(localStorage.getItem('token')) {
 const checkConnect = async () => {
     if (!localStorage.getItem('token')) window.location = 'http://localhost:5500/front/pages/connect.html';
 
-    const res = await fetch('http://localhost:5500/usernames', {
+    const res = await fetch('http://localhost:5023/usernames', {
         method: 'GET'
     });
 
     const ret = await res.json();
 
-    if (!ret.donnee.some(localStorage.getItem('token'))) {
+    if (!ret.donnee.some(username => username === localStorage.getItem('token'))) {
         window.location = 'http://localhost:5500/front/pages/connect.html';
     }
 }
