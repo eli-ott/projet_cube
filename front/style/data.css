@@ -19,6 +19,8 @@ main .data-container {
     width: 100%;
     height: 55vh;
     margin-bottom: 5%;
+    
+    box-shadow: 0em 0em 1em rgba(0, 0, 0, 0.4);
 
     border-radius: 15px;
     backdrop-filter: blur(15px) brightness(135%);
