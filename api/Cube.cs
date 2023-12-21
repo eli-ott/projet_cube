@@ -118,11 +118,10 @@ namespace Cube {
 
 
                     static void GetAllMeasures(WebApplication app)  => app.MapGet("/measures/{datedebut}/{datefin}", (string dateDebut, string dateFin) => EnsureThreadSafety(args => FindAllMeasures(dateDebut, dateFin)));
-                    static void GetDevices(WebApplication app)      => app.MapGet("devices",      () => EnsureThreadSafety(args => ReadDevices()));
-                    static void GetMeasureTypes(WebApplication app) => app.MapGet("measuretypes", () => EnsureThreadSafety(args => ReadMeasureTypes()));
-                    static void GetIPV4(WebApplication app)         => app.MapGet("serverip", () => ReadIPV4());
-
-                    static void GetUsers(WebApplication app)        => app.MapGet("usernames", () => EnsureThreadSafety(args => ReadUsernames()));
+                    static void GetDevices(WebApplication app)      => app.MapGet("/devices",      () => EnsureThreadSafety(args => ReadDevices()));
+                    static void GetMeasureTypes(WebApplication app) => app.MapGet("/measuretypes", () => EnsureThreadSafety(args => ReadMeasureTypes()));
+                    static void GetIPV4(WebApplication app)         => app.MapGet("/serverip", () => ReadIPV4());
+                    static void GetUsers(WebApplication app)        => app.MapGet("/usernames", () => EnsureThreadSafety(args => ReadUsernames()));
                     
                     static void PostConnection(WebApplication app)  => app.MapPost("/checkconnection", (Utilisateur utilisateur) => EnsureThreadSafety(args => CheckConnection(utilisateur)));
                     static void PostUtilisateur(WebApplication app) => app.MapPost("/newuser",         (Utilisateur utilisateur) => EnsureThreadSafety(args => AddUser(utilisateur)));
