@@ -1,8 +1,9 @@
 main {
     display: flex;
-    flex-flow: column nowrap;
+    flex-flow: row wrap;
     justify-content: flex-start;
     align-items: flex-start;
+    gap: 10%;
 
     min-height: 100vh;
     padding: 5%;
@@ -10,16 +11,16 @@ main {
 }
 
 main .data-container {
-
+    position: relative;
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
     align-items: center;
 
-    width: 100%;
-    height: 55vh;
+    width: 45%;
+    height: auto;
     margin-bottom: 5%;
-    
+
     box-shadow: 0em 0em 1em rgba(0, 0, 0, 0.4);
 
     border-radius: 15px;
@@ -27,44 +28,34 @@ main .data-container {
 
 }
 
-main .data-container .infos {
-    width: 35%;
-    height: 90%;
-
-    border-right: solid 2px rgba(0, 0, 0, 0.25);
-}
-
-.infos>* {
-    padding: 15px;
-    width: 100%;
-    height: 50%;
-}
-
-.info-title {
-    font-size: 22px;
-    text-align: center;
-    display: block;
-
-    width: 100%;
-}
-
-.infos .value-info button {
+#export {
+    position: absolute;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-    width: 100%;
+    width: 40px;
+    height: 40px;
+    left: 15px;
+    top: 15px;
 
     color: black;
     transition: 0.25s;
 
     background: none;
-    border: solid black 1px;
-    border-radius: 10px;
+    border: solid rgba(0, 0, 0, 0.5) 2px;
+    border-radius: 50vh;
     padding: 15px;
     font-size: 17px;
 }
 
-.infos .value-info button:hover {
-    background: rgba(255, 255, 255, 0.4);
+#submit img {
+    width: 24px;
+}
+
+#export:hover {
+    transform: scale(1.25);
 }
 
 .infos .value-info .info-title {
@@ -73,12 +64,45 @@ main .data-container .infos {
 
 .graph-container {
     padding: 1vw;
-    width: 65%;
+    width: 100%;
     height: 100%;
 }
 
-.graph-container canvas {
-    height: 100%;
+.dates-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: start;
+    align-items: center;
+    gap: 25px;
+
+    margin: 15px;
+}
+
+.dates {
+    outline: none;
+
+    padding: 5px;
+    font-size: 17px;
+
+    background: none;
+    backdrop-filter: blur(15px) brightness(135%);
+    border: solid 1px rgba(0, 0, 0, 0.5);
+}
+
+#submit {
+    cursor: pointer;
+
+    font-size: 17px;
+    padding: 10px;
+    min-width: 150px;
+    background: none;
+    
+    transition: 0.15s;
+    border-radius: 15px;
+    border: solid 1px rgba(0, 0, 0, 0.5);
+}
+#submit:hover {
+    backdrop-filter: blur(15px) brightness(135%);
 }
 
 @media screen and (max-width: 800px) {
@@ -90,13 +114,10 @@ main .data-container .infos {
         flex-flow: column nowrap;
         border-radius: 0;
         height: auto;
-    }
-
-    main .data-container .infos {
         width: 100%;
     }
 
-    .infos .value-info button {
+    #export {
         padding: 5px;
         font-size: 15px;
     }

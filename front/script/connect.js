@@ -1,3 +1,7 @@
+if(localStorage.getItem('token')) {
+    document.getElementById('se-connecter').style.display = "none";
+}
+
 /**
  * Check if the user already have a token to redirect to connect.html either do nothing
  */

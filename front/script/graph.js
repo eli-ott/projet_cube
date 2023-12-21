@@ -1,3 +1,13 @@
+const setDefaultDates = () => {
+    const today = new Date();
+    const past = new Date();
+    past.setDate(past.getDate() - 5);
+
+    document.getElementById('dateDebut').value = formatedDateAndTime(past);
+    document.getElementById('dateFin').value = formatedDateAndTime(today);
+}
+setDefaultDates();
+
 /**
  * Permet d'exporter le graph en .jpg
  */
@@ -51,7 +61,7 @@ const getAll = async () => {
         method: 'GET'
     });
     const ret_all = await res_all.json();
-    console.log(ret_all.donnee)
+    if (Object.keys(ret_all.donnee).length <= 0) cardContainer.innerHTML = 'Il n\'y a aucun élément à afficher à ces dates'
     Object.keys(ret_all.donnee).forEach((elem, i) => {
         let mesures = [];
         let instants = [];
@@ -67,7 +77,7 @@ const getAll = async () => {
         //ajoute une carte avec les données
         const card = `
         <section class="data-container">
-                <button data-graph="${i + 1}" id="export" class="export_buttons">Exporter le graphique</button>
+                <button data-graph="${i + 1}" id="export" class="export_buttons" onclick="exportGraph()"><img src="../../assets/share.svg" alt="share icon"></button>
                 <div class="graph-container" id="container_${i + 1}">
                     <canvas id="graph_${i + 1}"></canvas>
                 </div>
@@ -90,17 +100,17 @@ const getAll = async () => {
             const dataset = {
                 label: appareilIndexes[index],
                 data: mesures,
-                borderColor: "rgba(255, 255, 255, 0.5)",
-                pointRadius: 10,
+                pointRadius: 6,
                 backgroundColor: mesures.map(x => {
                     let color = colorLerpThree(BLUE, GREEN, RED, normalize(donnees.limiteMin, donnees.limiteMax, x));
                     return `rgb(${Math.round(color.r)}, ${Math.round(color.g)}, ${Math.round(color.b)})`;
                 }),
-                borderWidth: 5
+                borderWidth: 4,
+                borderColor: `rgba(${Math.round(Math.random() * 180)}, ${Math.round(Math.random() * 180)}, ${Math.round(Math.random() * 180)}, 0.5)`
+
             }
 
             datasets.push(dataset);
-
         });
 
         const dataGraph = {
