@@ -10,6 +10,7 @@ main {
 }
 
 main .data-container {
+
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
@@ -18,17 +19,19 @@ main .data-container {
     width: 100%;
     height: 55vh;
     margin-bottom: 5%;
+    
+    box-shadow: 0em 0em 1em rgba(0, 0, 0, 0.4);
 
-    border: solid 1px white;
-    border-radius: 25px;
+    border-radius: 15px;
     backdrop-filter: blur(15px) brightness(135%);
+
 }
 
 main .data-container .infos {
     width: 35%;
-    height: 100%;
+    height: 90%;
 
-    border-right: solid 1px black;
+    border-right: solid 2px rgba(0, 0, 0, 0.25);
 }
 
 .infos>* {
@@ -38,7 +41,7 @@ main .data-container .infos {
 }
 
 .info-title {
-    font-size: 23px;
+    font-size: 22px;
     text-align: center;
     display: block;
 
@@ -49,17 +52,19 @@ main .data-container .infos {
     cursor: pointer;
 
     width: 100%;
-    padding: 5px;
-    font-size: 17px;
 
-    background: none;
-    border: solid 1px black;
     color: black;
     transition: 0.25s;
+
+    background: none;
+    border: solid black 1px;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 17px;
 }
 
 .infos .value-info button:hover {
-    background: white;
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .infos .value-info .info-title {
@@ -67,11 +72,42 @@ main .data-container .infos {
 }
 
 .graph-container {
-    padding: 15px;
+    padding: 1vw;
     width: 65%;
     height: 100%;
 }
 
 .graph-container canvas {
     height: 100%;
+}
+
+@media screen and (max-width: 800px) {
+    main {
+        padding: 5% 0;
+    }
+
+    main .data-container {
+        flex-flow: column nowrap;
+        border-radius: 0;
+        height: auto;
+    }
+
+    main .data-container .infos {
+        width: 100%;
+    }
+
+    .infos .value-info button {
+        padding: 5px;
+        font-size: 15px;
+    }
+
+    .graph-container {
+        width: 100%;
+    }
+
+    .graph-container canvas {
+        width: 100% !important;
+        height: 35vh !important;
+        height: auto;
+    }
 }
