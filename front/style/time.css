@@ -3,6 +3,7 @@
     bottom: 0;
     right: 0;
     padding: 5px;
+    font-size: 15px;
     box-shadow: 0em 0em 1em rgba(0, 0, 0, 0.4);
 
     backdrop-filter: blur(15px) brightness(135%);

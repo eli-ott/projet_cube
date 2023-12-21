@@ -4,17 +4,17 @@ nav {
     flex-flow: row nowrap;
     justify-content: space-between;
     align-items: center;
-    gap: 1vw;
+    gap: 15px;
 
     top: 0;
     left: 0;
     width: 100%;
-    padding: 1vw;
+    padding: 15px;
     z-index: 9999;
     
     box-shadow: 0em 0em 1em rgba(0, 0, 0, 0.4);
 
-    border-bottom: solid #00000050 1px;
+    border-bottom: solid rgba(0, 0, 0, 0.5) 1px;
     backdrop-filter: blur(15px) brightness(135%);
 }
 
@@ -23,6 +23,7 @@ nav a {
     text-decoration: none;
     color: black;
     padding: 10px;
+    font-size: 17px;
 }
 
 nav a:hover {
@@ -48,9 +49,6 @@ nav a:hover {
 
         height: 100vh;
         width: 100%;
-    }
-    nav a {
-        font-size: 17px;
     }
     .icon {
         display: unset;

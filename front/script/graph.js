@@ -129,7 +129,9 @@
                 // Ajoute une carte avec les données
                 const card = `
                 <section class="data-container">
-                        <button data-graph="${i + 1}" id="export" class="export_buttons" onclick="exportGraph()"><img src="../../assets/share.svg" alt="share icon"></button>
+                        <button data-graph="${i + 1}" id="export" class="export_buttons" onclick="exportGraph()">
+                            <img data-graph="${i + 1}" src="../../assets/share.svg" alt="share icon">
+                        </button>
                         <div class="graph-container" id="container_${i + 1}">
                             <canvas id="graph_${i + 1}"></canvas>
                         </div>

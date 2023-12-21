@@ -44,7 +44,6 @@ const connect = async () => {
         body: JSON.stringify(data)
     });
     const ret = await res.json();
-    console.log(ret);
     if (ret.reussite === true) {
         localStorage.setItem('token', username);
         window.location = 'http://localhost:5500/front/pages/data.html';
