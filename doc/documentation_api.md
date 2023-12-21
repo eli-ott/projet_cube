@@ -1,4 +1,4 @@
-# Documentation
+# Documentation (API)
 ## Requêtes
 
 Toutes les reqûetes retournent une `ApiResponse` à leur fin sous le format suivant.

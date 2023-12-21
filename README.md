@@ -46,5 +46,6 @@ CREATE TABLE `mesure` (
 La seconde étape consiste en l'installation de [.NET SDK 7.0](https://dotnet.microsoft.com/en-us/download/dotnet/7.0). Il faut ensuite s'assurer d'héberger le répertoire afin de pouvoir utiliser l'interface web. Une fois terminée, il ne reste plus qu'à entrer la commande dans le répertoire : `dotnet run`.
 
 ## Annexes
+- [Documents conceptuels](doc/doc_conceptuels.md)
 - [Documentation de l'API](doc/documentation.md)
 - [Tests unitaires](doc/tests_unitaires.md)
