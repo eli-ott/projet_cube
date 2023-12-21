@@ -22,7 +22,7 @@ namespace Cube {
 
         public class Device {
             /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/                  public required string  idAppareil  { get; set; }
-            /** <summary> Nom permettant aux utilisateurs de distinguer les appareils </summary> **/  public          string? nomAppareil { get; set; } = "Nouvel appareil";
+            /** <summary> Nom permettant aux utilisateurs de distinguer les appareils </summary> **/  public          string? nomAppareil { get; set; }
             /** <summary> Identifiant du type de mesure associé </summary> **/                        public          int?    idType      { get; set; }
             /** <summary> Indique si le programme doit enregistrer ses mesures </summary> **/         public          bool    activation  { get; set; } = true;
         } // class ..
@@ -118,7 +118,7 @@ namespace Cube {
 
 
                 // Envoie des données aléatoires toutes les 5 secondes.
-                _ = new Timer(async _ => await Simulation.Run(true), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+                //_ = new Timer(async _ => await Simulation.Run(false), null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
 
 
                 app.UseCors(SpecialOrigin);
@@ -132,8 +132,8 @@ namespace Cube {
         // R E Q U Ê T E S   M Y . S Q L
         //===============================
 
-            /** Objet cadenas pour prévenir les erreurs asynchrones lors des reqêtes. **/ private static readonly object _Lock                             = new ();
-            /** Indicateur de l'activité de l'API. **/                                    public static          bool     IsQuerying { get; private set; } = false;
+            /** Objet cadenas pour prévenir les erreurs asynchrones lors des reqêtes. **/ private static readonly object _Lock                              = new ();
+            /** Indicateur de l'activité de l'API. **/                                    public static          bool     IsQuerying { get; internal set; } = false;
 
 
             /// <summary>
@@ -169,7 +169,7 @@ namespace Cube {
             /// <param name="dateDebut"> Date de début de la plage horaire sous le format yyyy-MM-dd HH:mm:ss. </param>
             /// <param name="dateFin"><  Date de fin de la plage horaire sous le format yyyy-MM-dd HH:mm:ss. /param>
             /// <returns></returns>
-            static ApiResponse<Dictionary<string, Dictionary<string, MeasureByDevice>>> FindAllMeasures(
+            public static ApiResponse<Dictionary<string, Dictionary<string, MeasureByDevice>>> FindAllMeasures(
                 string dateDebut,
                 string dateFin
             ){
@@ -179,12 +179,12 @@ namespace Cube {
                     instance.Connection?.Open();
 
                 /// Pour convertir une valeur normée en valeur originale = valeur normée * (borne max - borne min) + borne min
-                string query = "SELECT GROUP_CONCAT((valeur*(type_mesure.limite_max-type_mesure.limite_min)+type_mesure.limite_min)) as mesures, GROUP_CONCAT(instant) as instants, appareil.id_appareil, appareil.id_type, nom_type, unite_mesure FROM mesure JOIN appareil ON mesure.instant >= @dateDebut AND mesure.instant <= @dateFin AND mesure.id_appareil = appareil.id_appareil JOIN type_mesure ON appareil.id_type = type_mesure.id_type GROUP BY appareil.id_appareil";
+                string query = "SELECT GROUP_CONCAT((valeur*(type_mesure.limite_max-type_mesure.limite_min)+type_mesure.limite_min)) as mesures, GROUP_CONCAT(instant) as instants, appareil.id_appareil, appareil.id_type, nom_type, unite_mesure FROM mesure JOIN appareil ON appareil.activation AND mesure.instant >= @dateDebut AND mesure.instant <= @dateFin AND mesure.id_appareil = appareil.id_appareil JOIN type_mesure ON appareil.id_type = type_mesure.id_type GROUP BY appareil.id_appareil";
 
                 /// Dictionnaire qui à pour clé l'id_type et pour valeur le dictionnaire measuresByDevice 
                 Dictionary<string, Dictionary<string, MeasureByDevice>> measuresByType = new ();
 
-                try {
+                // try {
 
                     using MySqlCommand command = new (query, instance.Connection);
                     command.Parameters.AddWithValue("@dateDebut", dateDebut.Replace('_', ' '));
@@ -221,7 +221,7 @@ namespace Cube {
                     reader.Close();
 
                     return ApiResponse<Dictionary<string, Dictionary<string, MeasureByDevice>>>.Success(measuresByType);
-                } catch { return ApiResponse<Dictionary<string, Dictionary<string, MeasureByDevice>>>.Error(ConsoleLogger.LogError("Impossible d'afficher les mesures !")); }
+                // } catch { return ApiResponse<Dictionary<string, Dictionary<string, MeasureByDevice>>>.Error(ConsoleLogger.LogError("Impossible d'afficher les mesures !")); }
             } // ApiResponse ..
 
 
@@ -230,7 +230,7 @@ namespace Cube {
             /// </summary>
             /// <param name="measure"> Une mesure générique. </param>
             /// <returns> Une réponse API générique. </returns>
-            static ApiResponse<Any> AddMeasure(Measure measure) {
+            public static ApiResponse<Any> AddMeasure(Measure measure) {
 
                 DBConnection instance = DBConnection.Instance();
                 if (!instance.IsConnect())
@@ -479,23 +479,27 @@ namespace Cube {
                 if (!instance.IsConnect())
                     instance.Connection?.Open();
 
-                string queryMeasures = "DELETE FROM `mesure` WHERE `id_appareil` = @id_appareil";
-                try {
-                    using MySqlCommand command = new MySqlCommand(queryMeasures, instance.Connection);
-                    command.Parameters.AddWithValue("@id_appareil",  id);
-                    command.ExecuteNonQuery();
-                    ConsoleLogger.LogInfo("Suppression des mesures liées à l'identifiant " + id + ".");
-                } catch { return ApiResponse<Any>.Error(ConsoleLogger.LogError("Impossible de supprimer les mesures liées à l'identifiant " + id + " !")); }
+                // On vérifie que l'identifiant de l'appareil associé est valide.
+                if (id.ToDeviceBinaryID() is long binaryID) {
+
+                    string queryMeasures = "DELETE FROM `mesure` WHERE `id_appareil` = @id_appareil";
+                    try {
+                        using MySqlCommand command = new MySqlCommand(queryMeasures, instance.Connection);
+                        command.Parameters.AddWithValue("@id_appareil",  binaryID);
+                        command.ExecuteNonQuery();
+                        ConsoleLogger.LogInfo("Suppression des mesures liées à l'identifiant " + binaryID + ".");
+                    } catch { return ApiResponse<Any>.Error(ConsoleLogger.LogError("Impossible de supprimer les mesures liées à l'identifiant " + binaryID + " !")); }
 
 
-                string queryDevice = "DELETE FROM `appareil` WHERE `id_appareil` = @id_appareil";
-                try {
-                    using MySqlCommand command = new MySqlCommand(queryDevice, instance.Connection);
-                    command.Parameters.AddWithValue("@id_appareil",  id);
-                    command.ExecuteNonQuery();
-                    ConsoleLogger.LogInfo("Suppression de l'appareil à l'identifiant " + id + ".");
-                } catch { return ApiResponse<Any>.Error(ConsoleLogger.LogError("Impossible de supprimer l'appareil à l'identifiant " + id + " !")); }
-                return ApiResponse<Any>.Success();
+                    string queryDevice = "DELETE FROM `appareil` WHERE `id_appareil` = @id_appareil";
+                    try {
+                        using MySqlCommand command = new MySqlCommand(queryDevice, instance.Connection);
+                        command.Parameters.AddWithValue("@id_appareil",  binaryID);
+                        command.ExecuteNonQuery();
+                        ConsoleLogger.LogInfo("Suppression de l'appareil à l'identifiant " + binaryID + ".");
+                    } catch { return ApiResponse<Any>.Error(ConsoleLogger.LogError("Impossible de supprimer l'appareil à l'identifiant " + binaryID + " !")); }
+                    return ApiResponse<Any>.Success();
+                } else return ApiResponse<Any>.Error(ConsoleLogger.LogError(id + " n'est pas un identifiant sous le format IPV4-ID !"));
             } // void ..
 
 
