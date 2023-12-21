@@ -60,12 +60,17 @@ const getAll = async () => {
         const canvas = document.querySelectorAll('canvas');
         canvas.forEach(canva => {
             new Chart(canva, {
-                type: 'bar',
+                type: 'line',
                 data: {
-                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                    labels: ['Red', 'Blue', 'Yellow'],
                     datasets: [{
                         label: '# of Votes',
                         data: [-12, 19, 3, -5, 2, 3],
+                        borderWidth:3,
+                        borderColor: '#000000',
+                        pointRadius: 10,
+                        pointHoverRadius: 5,
+                        backgroundColor: ['#fff585', '#00ff58', '#548452'],
                         borderWidth: 1
                     }]
                 },
