@@ -51,6 +51,7 @@ Toutes les reqûetes retournent une `ApiResponse` à leur fin sous le format sui
     ]
 ```
 - `/serverip` → Renvoi l'IPV4 du serveur
+- `/usernames` → Renvoi tous les noms d'utilisateurs
 ---
 ### POST
 Ces requêtes permettent d'ajouter des données au programme via l'API.
@@ -81,6 +82,20 @@ Ces requêtes permettent d'ajouter des données au programme via l'API.
       "limiteMax":   125            // Plus grande valeur acceptée
     }
   ```
+- `/newuser` → Ajoute un nouvel utilisateur
+    ```json
+    {
+      "username": "Toto",
+      "password": "admin"
+    }
+    ```
+- `/checkconnection` → Vérifie si les identifiants de l'utilisateur sont bons
+    ```json
+    {
+      "username": "Toto",
+      "password": "admin"
+    }
+    ```
 ---
 ### PUT
 - `/device` → Mets à jour un appareil et l'ajoute s'il n'existe pas
