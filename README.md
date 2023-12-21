@@ -1,6 +1,6 @@
 # Projet Cube
 ## Présentation
-...
+Un serveur de collecte de données météorologiques notamment permettant aux sondes de tiers d'envoyer leur données via un API open source et stable.
 
 ## Premier démarage
 
