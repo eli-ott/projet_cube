@@ -12,8 +12,7 @@ nav {
     padding: 1vw;
     z-index: 9999;
 
-    border-bottom: solid black 1px;
-
+    border-bottom: solid #00000050 1px;
     backdrop-filter: blur(15px) brightness(135%);
 }
 
@@ -21,13 +20,40 @@ nav a {
     font-weight: bold;
     text-decoration: none;
     color: black;
-    background-color: rgba(255, 255, 255, 0.25);
-    border-radius: 0.5em;
-    padding:         1em;
+    padding: 10px;
 }
 
-nav a:hover { background-color: rgba(255, 255, 255, 0.4); }
+nav a:hover {
+    text-decoration: underline 1px black;
+}
 
 a {
     text-decoration: dotted;
+}
+.icon {
+    display: none;
+    position: fixed;
+
+    z-index: 9999;
+    top: 5px;
+    right: 5px;
+}
+
+@media screen and (max-width: 800px) {
+    nav {
+        display: none;
+        flex-flow: column nowrap;
+        justify-content: center;
+        align-items: center;
+        gap: 25px;
+
+        height: 100vh;
+        width: 100%;
+    }
+    nav a {
+        font-size: 17px;
+    }
+    .icon {
+        display: unset;
+    }
 }
