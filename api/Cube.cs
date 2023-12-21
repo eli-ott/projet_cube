@@ -54,6 +54,12 @@ namespace Cube {
 
         } // class ..
 
+        public class Utilisateur {
+            /** <summary> Identifiant auto incrémenté </summary> **/        public int?    idUser      { get; set; }
+            /** <summary> Nom d'utilisateur </summary> **/                  public required string username     { get; set; }
+            /** <summary> Le mot de passe de l'utilisateur </summary> **/   public required string password { get; set; }
+        }
+
 
 
     //===================
@@ -92,9 +98,13 @@ namespace Cube {
                     GetMeasureTypes(app);
                     GetIPV4(app);
                    
+                    GetUsers(app);
+
                     PostMeasure(app);
                     PostDevice(app);
                     PostMeasureType(app);
+                    PostUtilisateur(app);
+                    PostConnection(app);
 
                     PutDevice(app);
 
@@ -107,9 +117,19 @@ namespace Cube {
                     static void GetMeasureTypes(WebApplication app) => app.MapGet("measuretypes", () => EnsureThreadSafety(args => ReadMeasureTypes()));
                     static void GetIPV4(WebApplication app)         => app.MapGet("serverip", () => ReadIPV4());
 
-                    static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => EnsureThreadSafety(args => AddMeasure(measure)));
-                    static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => EnsureThreadSafety(args => AddDevice(device)));
-                    static void PostMeasureType(WebApplication app) => app.MapPost("/newmeasuretype", (MeasureType measureType) => EnsureThreadSafety(args => AddMeasureType(measureType)));
+                    static void GetLastMeasure(WebApplication app){
+                        app.MapGet("/lastmeasure-{idAppareil}", (int idAppareil) => {
+
+                        }); //app.MapGet ..
+                    } //void ..
+
+                    static void GetUsers(WebApplication app)        => app.MapGet("usernames",    () => ReadUsernames());
+                    
+                    static void PostConnection(WebApplication app)  => app.MapPost("/checkconnection", (Utilisateur utilisateur) => CheckConnection(utilisateur));
+                    static void PostUtilisateur(WebApplication app) => app.MapPost("/newuser",        (Utilisateur utilisateur) => AddUser(utilisateur));
+                    static void PostMeasure(WebApplication app)     => app.MapPost("/newmeasure",     (Measure     measure)     => AddMeasure(measure));
+                    static void PostDevice(WebApplication app)      => app.MapPost("/newdevice",      (Device      device)      => AddDevice(device));
+                    static void PostMeasureType(WebApplication app) => app.MapPost("/newmeasuretype", (MeasureType measureType) => AddMeasureType(measureType));
 
                     static void PutDevice(WebApplication app) => app.MapPut("/device", (Device device) => UpdateDevice(device));
 
@@ -311,6 +331,51 @@ namespace Cube {
                 return ApiResponse<Any>.Success();
             } // void ..
 
+            /// <summary>
+            /// Permet de vérifier la connection d'un utilisateur
+            /// </summary>
+            /// <param name="user">Les donées de l'utilisateur</param>
+            /// <returns>Le retour classique de l'API</returns>
+            static ApiResponse<Any> CheckConnection(Utilisateur user) {
+                DBConnection instance = DBConnection.Instance();
+                if(!instance.IsConnect()) 
+                    instance.Connection?.Open();
+
+                string query = "SELECT COUNT(*) FROM `utilisateurs` WHERE username = @username AND password = @password";
+                using (MySqlCommand command = new MySqlCommand(query, instance.Connection)) {
+                    command.Parameters.AddWithValue("@username", user.username);
+                    command.Parameters.AddWithValue("@password", user.password);
+
+                    if (Convert.ToInt32(command.ExecuteScalar()) == 0) {
+                        return ApiResponse<Any>.Error(ConsoleLogger.LogError("Aucun utilisateur ne correspond à ce nom ou à ce mot de passe !"));
+                    } else {
+                        return ApiResponse<Any>.Success();
+                    }
+                } // using ..
+            }
+
+            /// <summary>
+            /// Peremt d'ajouter un nouvel utilisateur
+            /// </summary>
+            /// <param name="user">Les données de l'utilisateur</param>
+            /// <returns>Si l'insertion à réussi</returns>
+            static ApiResponse<Any> AddUser(Utilisateur user) {
+                DBConnection instance = DBConnection.Instance();
+                if(!instance.IsConnect())
+                    instance.Connection?.Open();
+
+                string query = "INSERT INTO `utilisateurs` (`username`, `password`) VALUES (@username, @password)";
+                try {
+                    using MySqlCommand command = new MySqlCommand(query, instance.Connection);
+                    command.Parameters.AddWithValue("@username", user.username);
+                    command.Parameters.AddWithValue("@password", user.password);
+                    command.ExecuteNonQuery();
+                    ConsoleLogger.LogInfo("Ajout de " + user.username + " à la liste des utilisateurs");
+
+                } catch { return ApiResponse<Any>.Error(ConsoleLogger.LogError("Impossible d'ajouter " + user.username + " à la liste des utilisateurs !")); }
+                return ApiResponse<Any>.Success();
+            }
+
 
             /// <summary>
             /// Ajoute un type de mesure dans la base de donnée.
@@ -371,6 +436,30 @@ namespace Cube {
                     } catch { return ApiResponse<List<Device>>.Error(ConsoleLogger.LogError("Impossible de lire la liste des appareils !")); }
             } // List<Device> ..
 
+            /// <summary>
+            /// Récupère tous les noms d'utilisateurs
+            /// </summary>
+            /// <returns> La liste des noms d'utilisateurs </returns>
+            static ApiResponse<List<string>> ReadUsernames() {
+                DBConnection instance = DBConnection.Instance();
+                if(!instance.IsConnect())
+                    instance.Connection?.Open();
+
+                string query = "SELECT username FROM `utilisateurs`";
+                try {
+                    using MySqlCommand command      = new (query, instance.Connection);
+                    MySqlDataReader reader          = command.ExecuteReader();
+                    List<string> usernames          = new();
+
+                    while(reader.Read()) 
+                        usernames.Add(reader.GetString("username"));
+                    
+                    reader.Close();
+                    ConsoleLogger.LogInfo("Lecture des noms d'utilisateurs");
+
+                    return ApiResponse<List<string>>.Success(usernames);
+                } catch { return ApiResponse<List<string>>.Error(ConsoleLogger.LogError("Impossible de lire la liste des types de mesure !")); }
+            }
 
             /// <summary>
             /// Récupère les types de mesure dans la base de données.
