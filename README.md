@@ -1,7 +1,6 @@
 # Projet Cube
 ## Présentation
 ## Premier démarage
-### 1. Création de la base de données MySQL
 
 La première étape consiste en la création d'un base de donnée MySQL avec comme paramètres :
 - serveur : `localhost`
@@ -41,8 +40,7 @@ CREATE TABLE `mesure` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
 ```
 
-### 2. Mise en place de .NET
-La seconde étape consiste en l'installation de [.NET SDK 7.0](https://dotnet.microsoft.com/en-us/download/dotnet/7.0). Une fois terminée, il ne reste plus qu'à entrer la commande dans le répertoire : `dotnet run`.
+La seconde étape consiste en l'installation de [.NET SDK 7.0](https://dotnet.microsoft.com/en-us/download/dotnet/7.0). Il faut ensuite s'assurer d'héberger le répertoire afin de pouvoir utiliser l'interface web. Une fois terminée, il ne reste plus qu'à entrer la commande dans le répertoire : `dotnet run`.
 
 ## Annexes
 - [Documentation de l'API](doc/documentation.md)
