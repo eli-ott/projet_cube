@@ -20,8 +20,8 @@ CREATE TABLE `type_mesure` (
   `nom_type`     varchar(50) NOT NULL,
   `unite_mesure` varchar(15) NOT NULL,
   `limite_min`   float       NOT NULL,
-	`limite_max`   float       NOT NULL,
-  PRIMARY KEY (`id_type`),
+  `limite_max`   float       NOT NULL,
+  PRIMARY KEY (`id_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
 ```
 ```sql
