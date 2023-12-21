@@ -19,9 +19,30 @@
       <a href="./show-devices.html">Voir les appareils enregistrés</a>
       <a href="./add-measure.html">Ajouter un type de mesure</a>
       <a href="./add-device.html">Ajouter un appareil</a>
-      <a href="./connect.html">Se connecter</a>
+      <a href="./connect.html" id="se-connecter">Se connecter</a>
     </nav>
-    <main></main>
+    <div class="dates-container">
+      <input
+        type="dateDebut"
+        id="dateDebut"
+        class="dates"
+        placeholder="Date du début au format yyyy-mm-jj hh:mm:ss"
+        value="2023-12-19 09:10:50"
+      />
+      <input
+        type="dateFin"
+        id="dateFin"
+        class="dates"
+        placeholder="Date du fin au format yyyy-mm-jj hh:mm:ss"
+        value="2023-12-21 14:20:50"
+      />
+      <button id="submit" onclick="getAll()">Envoyer</button>
+    </div>
+    <main>
+      <p>
+        Il n'y a aucun élément à afficher à ces dates
+      </p>
+    </main>
     <div id="time"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
