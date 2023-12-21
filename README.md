@@ -31,7 +31,7 @@ Toutes les reqûetes retournent une `ApiResponse` à leur fin sous le format sui
 ```json
     [
       {
-        "idAppareil":  "182.168.0.32-23", // IPV4 (32 bits) + ID (32 bits) → doit être identique à celui de l'appareil à modifier
+        "idAppareil":  "182.168.0.32-23", // IPV4 (32 bits) + ID (32 bits)
         "nomAppareil": "RaspberryPI 4",   // Nom permettant aux utilisateurs de distinguer les appareils
         "idType":       2,                // Identifiant du type de mesure associé
         "activation":   true              // Indique si l'API doit écouter cet appareil
