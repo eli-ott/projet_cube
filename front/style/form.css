@@ -18,7 +18,9 @@ section div {
 
     padding: 15px;
     border-radius: 25px;
+}
 
+section #form-container {
     backdrop-filter: blur(15px) brightness(135%);
 }
 
