@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Cube.Data;
 using Google.Protobuf.WellKnownTypes;
 using MySql.Data.MySqlClient;
