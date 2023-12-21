@@ -16,11 +16,13 @@ namespace Cube {
             /** <summary> Concatenation de l'IPV4 et ID de l'appareil </summary> **/     public required string idAppareil { get; set; }
         } // class ..
 
-        public class MeasureByDevice{
-            /** <summary> Chaîne de caractère composée de valeurs séparées par une virgule </summary> **/ public required string valeur  { get; set; }
-            /** <summary> Chaîne de caractère composée de dates séparées par une virgule </summary> **/   public required string instant { get; set; }
-                                                                                                          public required string uniteMesure { get; set; }
-                                                                                                          public required string nomType { get; set; }
+        public class MeasureOutput{
+            /** <summary> Chaîne de caractère composée de valeurs séparées par une virgule </summary> **/  public required string valeur      { get; set; }
+            /** <summary> Chaîne de caractère composée de dates séparées par une virgule </summary> **/    public required string instant     { get; set; }
+            /** <summary> Unité de mesure </summary> **/                                                   public required string uniteMesure { get; set; }
+            /** <summary> Nom permettant aux utilisateurs de distinguer les types de mesure </summary> **/ public required string nomType     { get; set; }
+            /** <summary> Plus petite valeur acceptée </summary> **/                                       public          float  limiteMin   { get; set; }
+            /** <summary> Plus grande valeur acceptée </summary> **/                                       public          float  limiteMax   { get; set; }
         } // class ..
 
         public class Device {
@@ -192,7 +194,7 @@ namespace Cube {
             /// <param name="dateDebut"> Date de début de la plage horaire sous le format yyyy-MM-dd HH:mm:ss. </param>
             /// <param name="dateFin"><  Date de fin de la plage horaire sous le format yyyy-MM-dd HH:mm:ss. /param>
             /// <returns></returns>
-            public static ApiResponse<Dictionary<string, Dictionary<string, MeasureByDevice>>> FindAllMeasures(
+            public static ApiResponse<Dictionary<string, Dictionary<string, MeasureOutput>>> FindAllMeasures(
                 string dateDebut,
                 string dateFin
             ){
@@ -202,12 +204,12 @@ namespace Cube {
                     instance.Connection?.Open();
 
                 /// Pour convertir une valeur normée en valeur originale = valeur normée * (borne max - borne min) + borne min
-                string query = "SELECT GROUP_CONCAT((valeur*(type_mesure.limite_max-type_mesure.limite_min)+type_mesure.limite_min)) as mesures, GROUP_CONCAT(instant) as instants, appareil.id_appareil, appareil.id_type, nom_type, unite_mesure FROM mesure JOIN appareil ON appareil.activation AND mesure.instant >= @dateDebut AND mesure.instant <= @dateFin AND mesure.id_appareil = appareil.id_appareil JOIN type_mesure ON appareil.id_type = type_mesure.id_type GROUP BY appareil.id_appareil";
+                string query = "SELECT GROUP_CONCAT((valeur*(type_mesure.limite_max-type_mesure.limite_min)+type_mesure.limite_min)) as mesures, GROUP_CONCAT(instant) as instants, appareil.id_appareil, appareil.id_type, nom_type, unite_mesure, limite_min, limite_max FROM mesure JOIN appareil ON appareil.activation AND mesure.instant >= @dateDebut AND mesure.instant <= @dateFin AND mesure.id_appareil = appareil.id_appareil JOIN type_mesure ON appareil.id_type = type_mesure.id_type GROUP BY appareil.id_appareil";
 
                 /// Dictionnaire qui à pour clé l'id_type et pour valeur le dictionnaire measuresByDevice 
-                Dictionary<string, Dictionary<string, MeasureByDevice>> measuresByType = new ();
+                Dictionary<string, Dictionary<string, MeasureOutput>> measuresByType = new ();
 
-                // try {
+                try {
 
                     using MySqlCommand command = new (query, instance.Connection);
                     command.Parameters.AddWithValue("@dateDebut", dateDebut.Replace('_', ' '));
@@ -217,38 +219,42 @@ namespace Cube {
                     while (reader.Read()) {
 
                         /// Si l'id_type est présent dans le dictionnaire measuresByType
-                        if (measuresByType.TryGetValue(reader.GetString("id_type"), out Dictionary<string, MeasureByDevice>? measuresByDevice)){
+                        if (measuresByType.TryGetValue(reader.GetString("id_type"), out Dictionary<string, MeasureOutput>? measureOutput)){
 
                             /// Ajoute au dictionnaire measuresByDevice en clé l'id_appareil et en valeur la class MeasureByDevice qui contient les mesures et les instants
-                            measuresByDevice.Add(reader.GetString("id_appareil"), new() {
-                                valeur  = reader.GetString("mesures"),
-                                instant = reader.GetString("instants"),
+                            measureOutput.Add(reader.GetString("id_appareil"), new() {
+                                valeur      = reader.GetString("mesures"),
+                                instant     = reader.GetString("instants"),
                                 uniteMesure = reader.GetString("unite_mesure"),
-                                nomType = reader.GetString("nom_type")
+                                nomType     = reader.GetString("nom_type"),
+                                limiteMin   = reader.GetFloat("limite_min"),
+                                limiteMax   = reader.GetFloat("limite_max"),
                             }); // ..
                         } else {
 
                             /// On ajoute au dictionnaire measuresByDevice en clé l'id_appareil et en valeur la class MeasureByDevice qui contient les mesures et les instants
-                            measuresByDevice = new Dictionary<string, MeasureByDevice> {{
+                            measureOutput = new Dictionary<string, MeasureOutput> {{
                                 reader.GetString("id_appareil"),
                                 new() {
-                                    valeur  = reader.GetString("mesures"),
-                                    instant = reader.GetString("instants"),
+                                    valeur      = reader.GetString("mesures"),
+                                    instant     = reader.GetString("instants"),
                                     uniteMesure = reader.GetString("unite_mesure"),
-                                    nomType = reader.GetString("nom_type")
+                                    nomType     = reader.GetString("nom_type"),
+                                    limiteMin   = reader.GetFloat("limite_min"),
+                                    limiteMax   = reader.GetFloat("limite_max"),
                                 } // ..
                             }}; // ..
 
                             /// Puis ajoute au dictionnaire measureByType en clé l'id_type et en valeur le dictionnaire measuresByDevice
-                            measuresByType.Add(reader.GetString("id_type"), measuresByDevice);     
+                            measuresByType.Add(reader.GetString("id_type"), measureOutput);     
 
                         } // if ..
                     } // while ..
                     
                     reader.Close();
 
-                    return ApiResponse<Dictionary<string, Dictionary<string, MeasureByDevice>>>.Success(measuresByType);
-                // } catch { return ApiResponse<Dictionary<string, Dictionary<string, MeasureByDevice>>>.Error(ConsoleLogger.LogError("Impossible d'afficher les mesures !")); }
+                    return ApiResponse<Dictionary<string, Dictionary<string, MeasureOutput>>>.Success(measuresByType);
+                } catch { return ApiResponse<Dictionary<string, Dictionary<string, MeasureOutput>>>.Error(ConsoleLogger.LogError("Impossible d'afficher les mesures !")); }
             } // ApiResponse ..
 
 

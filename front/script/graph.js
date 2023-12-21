@@ -17,6 +17,27 @@ const exportGraph = (event) => {
     document.body.removeChild(a);
 }
 
+function colorLerpTwo(color1, color2, t) {
+    return {
+        r: color1.r + (color2.r - color1.r) * t,
+        g: color1.g + (color2.g - color1.g) * t,
+        b: color1.b + (color2.b - color1.b) * t
+    }; // ..
+} // function ..
+
+
+function colorLerpThree(color1, color2, color3, t) {
+    return colorLerpTwo(colorLerpTwo(color1, color2, t), colorLerpTwo(color2, color3, t), t);
+} // function ..
+
+function normalize(min, max, x) {
+    return (x - min) / (max - min)
+} // function ..
+
+const BLUE  = { r: 0, g: 0, b: 255 }; // Blue
+const GREEN = { r: 0, g: 255, b: 0 }; // Green
+const RED   = { r: 255, g: 0, b: 0 }; // Red
+
 /**
  * Get all the meseaures from the WS
  */
@@ -69,6 +90,12 @@ const getAll = async () => {
             const dataset = {
                 label: appareilIndexes[index],
                 data: mesures,
+                borderColor: "rgba(255, 255, 255, 0.5)",
+                pointRadius: 10,
+                backgroundColor: mesures.map(x => {
+                    let color = colorLerpThree(BLUE, GREEN, RED, normalize(donnees.limiteMin, donnees.limiteMax, x));
+                    return `rgb(${Math.round(color.r)}, ${Math.round(color.g)}, ${Math.round(color.b)})`;
+                }),
                 borderWidth: 5
             }
 
