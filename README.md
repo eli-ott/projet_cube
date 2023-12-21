@@ -1,5 +1,7 @@
 # Projet Cube
 ## Présentation
+...
+
 ## Premier démarage
 
 La première étape consiste en la création d'un base de donnée MySQL avec comme paramètres :
@@ -11,7 +13,8 @@ La première étape consiste en la création d'un base de donnée MySQL avec com
 Puis lancer dans l'ordre ces commandes SQL :
 ```sql
 CREATE DATABASE cubes;
-
+```
+```sql
 CREATE TABLE `type_mesure` (
   `id_type`      int         NOT NULL AUTO_INCREMENT,
   `nom_type`     varchar(50) NOT NULL,
