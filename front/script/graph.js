@@ -30,35 +30,23 @@ const getAll = async () => {
         method: 'GET'
     });
     const ret_all = await res_all.json();
-    console.log(ret_all.donnee);
-
+    console.log(ret_all.donnee)
     Object.keys(ret_all.donnee).forEach((elem, i) => {
         let mesures = [];
         let instants = [];
         let data = [];
-        console.log(ret_all.donnee[elem], ret_all.donnee[elem][key2]);
-        Object.keys(ret_all.donnee[elem]).forEach(key2 => {
+        let appareilIndexes = [];
+        let nomsTypes;
+        let unitesMesures;
+        Object.keys(ret_all.donnee[elem]).forEach((key2) => {
+            appareilIndexes.push(key2);
             data.push(ret_all.donnee[elem][key2]);
         });
 
-        data.forEach(donnees => {
-            mesures = [...donnees.valeur.split(',')];
-            instants = [...donnees.instant.split(',')];
-        });
         //ajoute une carte avec les données
         const card = `
         <section class="data-container">
-        <div class="infos">
-                <div class="device-info">
-                <span class="info-title">Mesure de température</span> <br />
-                </div>
-                <div class="value-info">
-                <span class="info-title">Dernière valeur</span> <br />
-                12°C mesuré le: 12/12/2023 à 5h00 <br />
-                <br />
                 <button data-graph="${i + 1}" id="export" class="export_buttons">Exporter le graphique</button>
-                </div>
-                </div>
                 <div class="graph-container" id="container_${i + 1}">
                     <canvas id="graph_${i + 1}"></canvas>
                 </div>
@@ -71,19 +59,42 @@ const getAll = async () => {
             button.addEventListener('click', exportGraph);
         });
 
+        let datasets = [];
+        data.forEach((donnees, index) => {
+            mesures = [...donnees.valeur.split(',')];
+            instants = [...donnees.instant.split(',')];
+            nomsTypes = donnees.nomType;
+            unitesMesures = donnees.uniteMesure;
+
+            const dataset = {
+                label: appareilIndexes[index],
+                data: mesures,
+                borderWidth: 5
+            }
+
+            datasets.push(dataset);
+
+        });
+
+        const dataGraph = {
+            labels: instants,
+            datasets
+        }
+
         setTimeout(() => {
             const canvas = document.getElementById(`graph_${i + 1}`);
 
             new Chart(canvas, {
                 type: 'line',
-                data: {
-                    labels: instants,
-                    datasets: [{
-                        label: '# of Votes',
-                        data: mesures,
-                        borderWidth: 1
-                    }]
-                },
+                data: dataGraph,
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: nomsTypes + ' en ' + unitesMesures,
+                        }
+                    }
+                }
             });
         });
     });

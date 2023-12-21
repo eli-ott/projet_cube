@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Cube.Data;
 using Google.Protobuf.WellKnownTypes;
 using MySql.Data.MySqlClient;
@@ -18,6 +19,8 @@ namespace Cube {
         public class MeasureByDevice{
             /** <summary> Chaîne de caractère composée de valeurs séparées par une virgule </summary> **/ public required string valeur  { get; set; }
             /** <summary> Chaîne de caractère composée de dates séparées par une virgule </summary> **/   public required string instant { get; set; }
+                                                                                                          public required string uniteMesure { get; set; }
+                                                                                                          public required string nomType { get; set; }
         } // class ..
 
         public class Device {
@@ -197,7 +200,9 @@ namespace Cube {
                             /// Ajoute au dictionnaire measuresByDevice en clé l'id_appareil et en valeur la class MeasureByDevice qui contient les mesures et les instants
                             measuresByDevice.Add(reader.GetString("id_appareil"), new() {
                                 valeur  = reader.GetString("mesures"),
-                                instant = reader.GetString("instants")
+                                instant = reader.GetString("instants"),
+                                uniteMesure = reader.GetString("unite_mesure"),
+                                nomType = reader.GetString("nom_type")
                             }); // ..
                         } else {
 
@@ -206,7 +211,9 @@ namespace Cube {
                                 reader.GetString("id_appareil"),
                                 new() {
                                     valeur  = reader.GetString("mesures"),
-                                    instant = reader.GetString("instants")
+                                    instant = reader.GetString("instants"),
+                                    uniteMesure = reader.GetString("unite_mesure"),
+                                    nomType = reader.GetString("nom_type")
                                 } // ..
                             }}; // ..
 
