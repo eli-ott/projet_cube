@@ -176,15 +176,13 @@
                     nomsTypes     = donnees.nomType;
                     unitesMesures = donnees.uniteMesure;
 
-                    console.log(normalizedGroupsConverted[index][1]);
-
                     const dataset = {
 
                         label:       appareilIndexes[index],
                         data:        mesures,
                         pointRadius: 6,
-                        borderWidth: 4,
-                        borderColor: `rgba(${Math.round(Math.random() * 180)}, ${Math.round(Math.random() * 180)}, ${Math.round(Math.random() * 180)}, 0.3)`,
+                        borderWidth: 2,
+                        borderColor: `rgb(${Math.round(Math.random() * 180)}, ${Math.round(Math.random() * 180)}, ${Math.round(Math.random() * 180)})`,
                         backgroundColor: mesures.map(x => {
 
                             // Génère une couleur à partir d'un gradient et d'une mesure.
@@ -235,4 +233,4 @@
 
     // Mets à jour les graphique toutes les 30 secondes.
     getAll();
-    setInterval(() => { getAll(); }, 30000);
+    setInterval(() => { getAll(); }, 10000);
