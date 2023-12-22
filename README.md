@@ -57,3 +57,4 @@ La seconde étape consiste en l'installation de [.NET SDK 7.0](https://dotnet.mi
 - [Documents conceptuels](doc/doc_conceptuels.md)
 - [Documentation de l'API](doc/documentation_api.md)
 - [Tests unitaires](doc/tests_unitaires.md)
+- [Tests fonctionnels](doc/tests_fonctionnels.md)
