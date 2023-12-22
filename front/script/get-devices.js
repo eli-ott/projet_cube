@@ -33,9 +33,9 @@ const showDevices = (data) => {
     data.forEach(device => {
         const card = `
         <div class="carte appareil">
-            <div><u>Nom appareil</u> : ${device.idAppareil}</div>
+            <div><u>Nom appareil</u> : ${device.nomAppareil}</div>
             <br />
-            <div><u>ID de l'appareil</u> : ${device.nomAppareil}</div>
+            <div><u>ID de l'appareil</u> : ${device.idAppareil}</div>
             <br />
             <div><u>ID du type lié</u> : ${device.idType}</div>
             <br />
