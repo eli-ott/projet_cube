@@ -25,9 +25,6 @@ const getDevices = async () => {
     }
 }
 getDevices();
-setInterval(() => {
-    getDevices();
-}, 5000);
 
 /**
  * Show all the devices
