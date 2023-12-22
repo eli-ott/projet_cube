@@ -12,7 +12,7 @@ const getServerIP = async () => {
     if (ret_ip.reussite === true) {
         ip = ret_ip.donnee;
     } else {
-        alert('Problème lors de la récupération de l\'adresse IP');
+        ip = 'localhost';
     }
 } // const ..
 

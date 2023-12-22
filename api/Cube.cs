@@ -196,7 +196,7 @@ namespace Cube {
                     instance.Connection?.Open();
 
                 /// Pour convertir une valeur normée en valeur originale = valeur normée * (borne max - borne min) + borne min
-                string query = "SELECT GROUP_CONCAT((valeur*(type_mesure.limite_max-type_mesure.limite_min)+type_mesure.limite_min)) as mesures, GROUP_CONCAT(instant) as instants, appareil.id_appareil, appareil.id_type, nom_type, unite_mesure, limite_min, limite_max FROM mesure JOIN appareil ON appareil.activation AND mesure.instant >= @dateDebut AND mesure.instant <= @dateFin AND mesure.id_appareil = appareil.id_appareil JOIN type_mesure ON appareil.id_type = type_mesure.id_type GROUP BY appareil.id_appareil";
+                string query = "SELECT GROUP_CONCAT((valeur*(type_mesure.limite_max-type_mesure.limite_min)+type_mesure.limite_min)) as mesures, GROUP_CONCAT(instant ORDER BY mesure.instant) as instants, appareil.id_appareil, appareil.id_type, nom_type, unite_mesure, limite_min, limite_max FROM mesure JOIN appareil ON appareil.activation AND mesure.instant >= '2023-12-17 11:00:22' AND mesure.instant <= '2023-12-22 11:00:22' AND mesure.id_appareil = appareil.id_appareil JOIN type_mesure ON appareil.id_type = type_mesure.id_type GROUP BY appareil.id_appareil;";
 
                 /// Dictionnaire qui à pour clé l'id_type et pour valeur le dictionnaire measuresByDevice 
                 Dictionary<string, Dictionary<string, MeasureOutput>> measuresByType = new ();
