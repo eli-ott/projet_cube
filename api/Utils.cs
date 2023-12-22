@@ -11,14 +11,14 @@ namespace Cube.Data {
         /// <param name="self"> La concatenation d'un IPV4 et d'un identifiant 32 bit. </param>
         /// <returns> Un identifiant 64 bit si le format correspond, autrement retourne `null`. </returns>
         public static long? ToDeviceBinaryID(this string self) {
-            string[] arguments = self.Split('-', '.');
-
             try {
-                long id = (long)int.Parse(arguments[0])
-                | ((long)int.Parse(arguments[1])) <<  8
-                | ((long)int.Parse(arguments[2])) << 16
-                | ((long)int.Parse(arguments[3])) << 24
-                | ((long)int.Parse(arguments[4])) << 32;
+                string[] arguments = self.Split('-');
+                string[] bytes     = arguments[0].Split('.');
+                long id = (long)int.Parse(bytes[0])
+                | ((long)int.Parse(bytes[1]))     <<  8
+                | ((long)int.Parse(bytes[2]))     << 16
+                | ((long)int.Parse(bytes[3]))     << 24
+                | ((long)int.Parse(arguments[1])) << 32;
                 return id;
             } catch { return null; }
         } // int ..
