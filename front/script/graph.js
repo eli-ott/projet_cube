@@ -144,14 +144,39 @@
                 buttons.forEach(button => { button.addEventListener('click', exportGraph); }); 
 
 
+                // Example list of groups with string and float values as comma-separated strings
+
+                // Collecting all unique strings
+                const allStrings = [...new Set(data.flatMap(group => group.instant.split(',')))].sort();
+
+                // Normalizing each group
+                const normalizedGroups = data.map(group => {
+                    const strings = group.instant.split(',');
+                    const floats  = group.valeur.split(',').map(float => parseFloat(float));
+
+                    return allStrings.map(str => {
+                        const index = strings.indexOf(str);
+                        return index !== -1 ? [str, floats[index]] : [str, null];
+                    });
+                });
+
+                // Converting back to the comma-separated string format
+                const normalizedGroupsConverted = normalizedGroups.map(group => {
+                    const strings = group.map(item => item[0]);
+                    const floats  = group.map(item => item[1] !== null ? item[1] : null);
+                    return [strings, floats];
+                });
+
                 // Génère une ligne par appareils
                 let datasets = [];
                 data.forEach((donnees, index) => {
 
-                    mesures       = [...donnees.valeur.split(',')];
-                    instants      = [...donnees.instant.split(',')];
+                    mesures       = normalizedGroupsConverted[index][1];
+                    instants      = normalizedGroupsConverted[index][0];
                     nomsTypes     = donnees.nomType;
                     unitesMesures = donnees.uniteMesure;
+
+                    console.log(normalizedGroupsConverted[index][1]);
 
                     const dataset = {
 

@@ -92,6 +92,8 @@ namespace Cube {
                 connection.UserName     = "root";
                 connection.Password     = "ESuKyuERu#2023";
 
+                
+
 
                 //=========================
                 // R E Q U Ê T E S   A P I
