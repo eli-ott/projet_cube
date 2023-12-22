@@ -137,7 +137,7 @@ namespace Cube {
 
 
                 // Envoie des données aléatoires toutes les 5 secondes.
-                _ = new Timer(async _ => await Simulation.Run(true), null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+                _ = new Timer(async _ => await Simulation.Run(true), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
 
 
                 app.UseCors(SpecialOrigin);

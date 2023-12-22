@@ -12,8 +12,8 @@ namespace Cube {
             /** <summary> Référence vers l'instance du client HTTP </summary> **/         private static readonly HttpClient client = new ();
             /** <summary> Référence vers le thread de génération aléatoire </summary> **/ private static readonly Random random     = new ();
 
-            /** <summary> Quantité d'appareil à simuler. </summary> **/        private const int SimulatedDevices      = 5;
-            /** <summary> Quantité de type de mesure à simuler. </summary> **/ private const int SimulatedMeasureTypes = 4;
+            /** <summary> Quantité d'appareil à simuler. </summary> **/        private const int SIMULATED_DEVICES_COUNT      = 5;
+            /** <summary> Quantité de type de mesure à simuler. </summary> **/ private const int SIMULATED_MEASURE_TYPE_COUNT = 4;
 
 
         //=============================
@@ -24,12 +24,14 @@ namespace Cube {
             /// Lance une instance parallèle qui envoie des donnée générées aléatoirement vers l'API.
             /// </summary>
             public static async Task Run(bool onlyMeasures = false) {
-                if (!onlyMeasures) {
-                    await PostRandomMeasureType();
-                    await PostRandomDevice();
-                } // if ..
+                for (int device = 1; device <= SIMULATED_DEVICES_COUNT; device++) {
+                    if (!onlyMeasures) {
+                        await PostRandomMeasureType();
+                        await PostRandomDevice(device);
+                    } // if ..
 
-                await PostRandomMeasure();
+                    await PostRandomMeasure(device);
+                } // for ..
             } // Task ..
 
 
@@ -51,11 +53,11 @@ namespace Cube {
             /// <summary>
             /// Fait une requête POST pour un appareil aléatoire.
             /// </summary>
-            private static async Task PostRandomDevice() {
+            private static async Task PostRandomDevice(int id) {
                 Device device = new() {
-                    idAppareil  = "192.168.0.32-" + random.Next(0, SimulatedDevices),
+                    idAppareil  = "192.168.0.32-" + id,
                     nomAppareil = "Device " + random.Next(),
-                    idType      = random.Next(1, SimulatedMeasureTypes)
+                    idType      = random.Next(1, SIMULATED_MEASURE_TYPE_COUNT)
                 }; // ..
 
                 await PostData("http://localhost:5023/newdevice", device);
@@ -65,11 +67,11 @@ namespace Cube {
             /// <summary>
             /// Fait une requête POST pour une mesure aléatoire.
             /// </summary>
-            private static async Task PostRandomMeasure() {
+            private static async Task PostRandomMeasure(int id) {
                 Measure measure = new() {
                     valeur     = random.NextSingle(),
                     instant    = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                    idAppareil = "192.168.0.32-" + random.Next(0, SimulatedDevices),
+                    idAppareil = "192.168.0.32-" + id,
                 }; // ..
 
                 await PostData("http://localhost:5023/newmeasure", measure);
