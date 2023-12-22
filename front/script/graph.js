@@ -105,7 +105,7 @@
 
             const res_all = await fetch('http://localhost:5023/measures/' + dateDebut + '/' + dateFin, { method: 'GET' });
             const ret_all = await res_all.json();
-
+            console.log(ret_all.donnee);
             if (Object.keys(ret_all.donnee).length === 0)
                 cardContainer.innerHTML = 'Il n\'y a aucun élément à afficher à ces dates';
 
@@ -233,4 +233,4 @@
 
     // Mets à jour les graphique toutes les 30 secondes.
     getAll();
-    setInterval(() => { getAll(); }, 10000);
+    setInterval(() => { window.location.reload(); }, 30000);
