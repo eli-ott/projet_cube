@@ -12,6 +12,9 @@ namespace Cube {
             /** <summary> Référence vers l'instance du client HTTP </summary> **/         private static readonly HttpClient client = new ();
             /** <summary> Référence vers le thread de génération aléatoire </summary> **/ private static readonly Random random     = new ();
 
+            /** <summary> Quantité d'appareil à simuler. </summary> **/        private const int SimulatedDevices      = 5;
+            /** <summary> Quantité de type de mesure à simuler. </summary> **/ private const int SimulatedMeasureTypes = 4;
+
 
         //=============================
         // I M P L E M E N T A T I O N
@@ -50,9 +53,9 @@ namespace Cube {
             /// </summary>
             private static async Task PostRandomDevice() {
                 Device device = new() {
-                    idAppareil  = "192.168.0.32-" + random.Next(0, 10),
+                    idAppareil  = "192.168.0.32-" + random.Next(0, SimulatedDevices),
                     nomAppareil = "Device " + random.Next(),
-                    idType      = random.Next(1, 10)
+                    idType      = random.Next(1, SimulatedMeasureTypes)
                 }; // ..
 
                 await PostData("http://localhost:5023/newdevice", device);
@@ -66,7 +69,7 @@ namespace Cube {
                 Measure measure = new() {
                     valeur     = random.NextSingle(),
                     instant    = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                    idAppareil = "192.168.0.32-" + random.Next(0, 10),
+                    idAppareil = "192.168.0.32-" + random.Next(0, SimulatedDevices),
                 }; // ..
 
                 await PostData("http://localhost:5023/newmeasure", measure);
